@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Emily Blogstein]]></title>
-  <link href="http://bookstein.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: goals | Emily Blogstein]]></title>
+  <link href="http://bookstein.github.io/blog/categories/goals/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
   <updated>2016-08-23T05:38:15-07:00</updated>
   <id>http://bookstein.github.io/</id>
