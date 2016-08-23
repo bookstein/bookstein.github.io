@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Emily Blogstein]]></title>
+  <link href="http://bookstein.github.io/atom.xml" rel="self"/>
+  <link href="http://bookstein.github.io/"/>
+  <updated>2016-08-23T03:36:43-07:00</updated>
+  <id>http://bookstein.github.io/</id>
+  <author>
+    <name><![CDATA[Emily Bookstein]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+</feed>
