@@ -9,7 +9,7 @@
 
 <meta name="author" content="Emily Bookstein"> 
 
-<meta name="description" content="All Posts Hello World Almost a year and a half ago, on March 2, 2015, I started work as a software engineer. I was new to Portland, new to &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="All Posts Going Deeper With DNS Sometimes you just need to say things out loud to someone else to know that you understand something. That&rsquo;s &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -107,6 +107,214 @@ $(document).ready(
 
   <div class="article-list">
     <div class="container">
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/08/24/going-deeper-with-dns/">Going Deeper With DNS</a></h2>
+  
+  <p>
+    <p>Sometimes you just need to say things out loud to someone else to know that you understand something. That&rsquo;s what I did with my coworker the other day &ndash; just described out loud to him how I thought our internal service worked. It really helped. I got to put my vague thoughts into words, and he offered corrections as needed.</p>
+
+
+
+
+<p>Turns out that, like most things, our service works because of the magic that is the Internet. HTTP requests, DNS lookup, IP addresses, CORS, etc, are all at the core of how it functions. Trying to explain how the service worked reminded me of the code interview prep question I practiced when I was trying to get my first software job: &ldquo;Explain how the Internet works at a high level.&rdquo;</p>
+
+
+
+
+<h3>The /etc/hosts hack</h3>
+
+
+
+
+<p>DNS (Domain Name System) lookup is hierarchical. When you make a request for a domain like google.com, the request will travel up through a series of DNS servers until it finds an entry for google.com that points to a specific IP address.</p>
+
+
+
+
+<p>From your laptop, the very first place your computer looks in that hierarchy chain is a file called <code>/etc/hosts</code>. It contains a list of domain names and IP addresses, just like any other DNS server. And so, if you put an entry like this:</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>127.0.0.1   www.google.com</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>then from now on, when you try to load google.com in your browser (unless your browser has a cached version), you will actually be directed to 127.0.0.1 &ndash; your own machine.</p>
+
+
+
+
+<p>This is useful if you want to simulate, say, hitting an internal service that proxies your request to another app. Put the IP address of the internal service with the name of your app in your <code>/etc/hosts</code> file, and your computer will map the domain of the app to the real live internal service, located at that IP address, that receives the request and proxies it elsewhere.</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># the internal service IP        the app
+</span><span class='line'>55.5.555.55                      mycoolapp.mydomain.com</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>Who controls DNS?</h3>
+
+
+
+
+<p>So besides just putting it in your <code>/etc/hosts</code> file, how do IP addresses end up with registered domain names?</p>
+
+
+
+
+<p>when you buy a domain (like from Namecheap or Godaddy), those vendors work with <a href="http://www.iana.org/">IANA</a> to add your DNS entry &ndash; that&rsquo;s the department of <a href="https://en.wikipedia.org/wiki/ICANN">ICANN</a> that controls IP/DNS stuff. Yes, deep down in there, there&rsquo;s a bureaucracy (no offense, IANA) sitting inside the Internet, pulling the strings.</p>
+
+
+
+
+<p>Companies may have their own DNS servers, too. Internal apps and services that don&rsquo;t need to be accessed by the public Internet can have IP addresses that don&rsquo;t need to be registered through IANA.</p>
+
+
+
+
+<h3>Domain Name VS. Host VS. IP</h3>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>55.5.555.55     mydata.com        # domain name
+</span><span class='line'>55.5.555.55     wwww.mydata.com   # sub-domain</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>It used to be the case that subdomains usually had their own unique IP address. Then we learned about <em>Reduce, Reuse, Recycle</em>. Now, it&rsquo;s common for any one IP address to have many subdomains. So how do we know where exactly to send the request?</p>
+
+
+
+
+<p>Every HTTP request comes with a <code>Host</code> header. The Host header identifies the location &ndash; the actual host machine &ndash; to where we&rsquo;re sending packets. The host is the domain name of the server (as well as the port if a nonstandard port is being used). Getting close to the metal here!</p>
+
+
+
+
+<p>Knowing the hostname and port, we can now send the request to the correct host at the IP address we looked up.</p>
+
+
+
+
+<h3>In Summary: A Midsummer Night&rsquo;s Dream</h3>
+
+
+
+
+<p><img class="[Thisbe]" src="/images/271px-John_William_Waterhouse_-_Thisbe,_1909.jpg" width="271" height="480" title="[Thisbe [painting of Thisbe]]" ></p>
+
+
+
+
+<h6>Image: John William Waterhouse - Art Renewal Center – description, Public Domain, <a href="https://commons.wikimedia.org/w/index.php?curid=39913701">https://commons.wikimedia.org/w/index.php?curid=39913701</a></h6>
+
+
+
+
+<p>Let&rsquo;s say you&rsquo;re making an internal service who receives requests from one lover, inserts some headers into the request, and proxies the request to its ultimate destination &ndash; then hands back the response. A go-between romantic messenger service.</p>
+
+
+
+
+<p>Let&rsquo;s pull in some Shakespeare: your service is Wall, and your lovers are Pyramus and Thisbe.</p>
+
+
+
+
+<p>Here is the information you need:</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Wall: wall.service.com
+</span><span class='line'>Pyramus: pyramus.mylove.org:8080
+</span><span class='line'>Thisbe: thisbe.mydove.org:5000
+</span><span class='line'>
+</span><span class='line'>1.1.1.1 wall.service.com
+</span><span class='line'>99.9.9.999 pyramus.mylove.org
+</span><span class='line'>88.8.8.888 thisbe.mydove.org</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>Let&rsquo;s put Pyramus behind the Wall. We&rsquo;ll need a DNS entry that looks like this:</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1.1.1.1 pyramus.mylove.org</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>Now, Thisbe sends an HTTP request to Pyramus with the domain name <code>wall.service.com</code> and the host header <code>pyramus.mylove.org:8080</code>.</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>curl 'wall.service.com' -H 'pyramus.mylove.org:8080'</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>The Wall receives the request (because it&rsquo;s at <code>1.1.1.1</code>, the IP address that matches the domain), sees the host header, and passes the request on to Pyramus. Success! (Of course, there will be a response back to Thisbe too, but it&rsquo;s too saccharine to print here.)</p>
+
+
+
+
+<p>Exeunt.</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-24T07:38:02-07:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
       
       
       <div class="row">
