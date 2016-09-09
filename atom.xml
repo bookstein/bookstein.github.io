@@ -4,7 +4,7 @@
   <title><![CDATA[Emily Blogstein]]></title>
   <link href="http://bookstein.github.io/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2016-08-25T05:23:43-07:00</updated>
+  <updated>2016-09-09T05:39:48-07:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -12,6 +12,76 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The Legend of Cassandra]]></title>
+    <link href="http://bookstein.github.io/blog/2016/09/09/the-legend-of-cassandra/"/>
+    <updated>2016-09-09T04:58:00-07:00</updated>
+    <id>http://bookstein.github.io/blog/2016/09/09/the-legend-of-cassandra</id>
+    <content type="html"><![CDATA[<p><img class="[Cassandra]" src="http://bookstein.github.io/images/cassandra.jpeg" width="620" height="372" title="[Cassandra [painting of Cassandra]]" ></p>
+
+<h6>Image: <a href="https://www.theguardian.com/world/2015/jan/26/alexis-tsiprass-victory-speech-cassandra-myth-greek-elections">The Guardian</a></h6>
+
+<p>According to Greek legend, Cassandra was a prophet. She foresaw terrible, tragic futures — but as if that wasn’t enough, she was also cursed to never be believed.</p>
+
+<p>I had always wondered why on earth <a href="http://planetcassandra.org">Apache Cassandra</a> was named after a prophet who was never believed. Doesn’t give you the greatest confidence in their software, no?</p>
+
+<p>But yesterday, I learned a ton about Cassandra from a knowledgeable coworker — and now, the reference to Greek legend makes sense.</p>
+
+<h2>What is Cassandra?</h2>
+
+<p>Cassandra is a distributed data management system built for handling large volumes of I/O with no single point of failure. With Cassandra, your database is just a file system, with files spread out over a number of nodes that are arranged in a cluster.</p>
+
+<p><img class="[Cassandra]" src="http://bookstein.github.io/images/cassandra-ring.png" width="219" height="215" title="[Cassandra ring [Cassandra ring]]" ></p>
+
+<h6>Image: PlanetCassandra.org</h6>
+
+<h2>How is it different from MySQL?</h2>
+
+<p>Relational databases like MySQL and Postgres use a binary tree structure to store information. Binary trees are great for reading information quickly — they&rsquo;re a data structure that accommodates binary search, dividing predictable/sortable information in half and search the new half for the desired row. However, adding new rows to a binary tree is kind of ugly. You add the new information as randomly-inserted leaf nodes in the tree and now your binary tree is out of order.</p>
+
+<p>Cassandra solves this problem by getting rid of the binary tree and replacing it with a token ring. In a token ring, you start with a key (like “start time” or “id”) and generate a unique hashed key, an unsigned <code>Long</code> with a value somewhere between -2<sup>64</sup> and 2<sup>63</sup>. The ring is divided into chunks, each of which have a node assigned to it. For example, you might have a chunk of hashed keys assigned to Node 1, another chunk to Node 3, another chunk to Node 2, another chunk to Node 1, another chunk to Node 3, etc. The chunks are distributed in a somewhat random way to try to fairly balance the load — you wouldn’t want a bunch of traffic going to Node 1 and overwhelming it with requests.</p>
+
+<p>But, just like the prophet from Greek legend, never believe Cassandra.</p>
+
+<h2>Can’t trust Cassandra</h2>
+
+<p>Any one node by itself can’t be trusted. In fact, the token ring doesn’t just assign one node to each chunk of hash keys, but a list of nodes in the order in which to try to write the data. For example: chunk 256 => [2,3,1]. This will try to write to Node 2 first, then 3, then 1. The data will be stored on multiple nodes eventually.</p>
+
+<p>Every cluster has a replication factor, a value that determines how many nodes to repeat the data on. For example, if our 3-node cluster has a replication factor (RF) of 3, then data will be stored on all 3 of the nodes. My coworker strongly believes that 3 is the minimum sensible RF — because if any of your nodes ever goes down, then you’d rely on a backup node, and you’d need 1 more node to double-check to verify the data is good. (3 nodes - 1 node = 2 nodes. 1 node for requesting the data, 1 to double-check that the first one is right.)</p>
+
+<p><img class="[Cassandra nodes]" src="http://bookstein.github.io/images/nodes.png" width="662" height="482" title="[Cassandra nodes [Cassandra nodes]]" ></p>
+
+<h6>Image: <a href="https://www.hakkalabs.co/articles/how-cassandra-stores-data">HakkaLabs</a></h6>
+
+<h2>Scalable system</h2>
+
+<p>One thing that’s amazing about Cassandra is how easy it is to add a new node and therefore add capacity to a cluster. You add the provisioned server to the cluster by simply starting Cassandra on the server (it’s a Java app), then adding its IP address to the list of known nodes. The Cassandra node gets the schema information from the “seed” nodes (the seed nodes are just the nodes, listed by IP address, found in the Cassandra config under “seeds”), the token ring breaks and re-forms to include the new node, and the new node begins streaming data from older nodes. Once it’s joined the cluster and owns all the information it’s expected to own, then it’s ready to receive traffic, and you’ve just added a terabyte of available storage space to your database.</p>
+
+<p>There are no masters, there are no replicas. Just nodes.</p>
+
+<p>It’s a cool system. The co-op nerd side of me loves the hierarchy-free model based on negotiation, shared ownership, and consent among nodes.</p>
+
+<p>However, there are some serious drawbacks to using Cassandra.</p>
+
+<h2>What’s wrong with Cassandra?</h2>
+
+<p>The biggest downside of Cassandra that has come up so far in conversation: it was designed to solve the problem of slow writes. When MySQL or Postgres write something new to a binary tree, that information gets spread out over the binary tree &ndash; it&rsquo;s not all in one place. Cassandra, on the other hand, writes new information all together. This is convenient when your model of storage is a spinning hard disk drive, where you&rsquo;d want all the writes to be together.</p>
+
+<p>But with the advent of solid-state drives, this problem might feel a little irrelevant. And given that Cassandra requires a lot of specialized knowledge outside the comfort zone of people who understand SQL really well, there might not be enough of an incentive to make the switch &ndash; or to even stop using Cassandra after having started.</p>
+
+<hr />
+
+<h4>Sources:</h4>
+
+<ul>
+<li><a href="http://www.planetcassandra.org/what-is-apache-cassandra/">http://www.planetcassandra.org/what-is-apache-cassandra/</a></li>
+<li><a href="https://www.hakkalabs.co/articles/how-cassandra-stores-data">https://www.hakkalabs.co/articles/how-cassandra-stores-data</a></li>
+<li>My awesome coworker</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Going deeper with DNS]]></title>

@@ -1,0 +1,227 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script data-cfasync="false" type="text/javascript" src="//use.typekit.net/axj3cfp.js"></script>
+	<script data-cfasync="false" type="text/javascript">try{Typekit.load();}catch(e){}</script>
+	<meta charset="utf-8">
+	<title>The Legend of Cassandra  | Emily Blogstein</title>
+
+<meta name="author" content="Emily Bookstein"> 
+
+<meta name="description" content="Image: The Guardian According to Greek legend, Cassandra was a prophet. She foresaw terrible, tragic futures — but as if that wasn’t enough, she was &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Emily Blogstein" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/javascripts/jquery.fancybox.pack.js"></script>
+
+<script language="Javascript" type="text/javascript">
+$(document).ready(
+  function() {
+    (function($) {
+      $(".fancybox[data-content-id]").each(function() {
+        this.href = $(this).data('content-id');
+      });
+      $(".fancybox").fancybox({
+        beforeLoad: function() {
+          var el, 
+              id = $(this.element).data('title-id');
+
+          if (id) {
+            el = $('#' + id);
+
+            if (el.length) {
+              this.title = el.html();
+            }
+          }
+          if ($(this).data('content')) {
+            this.content = $(this).data('content');
+          }
+        },
+        helpers: {
+          title: {
+            type: 'inside'
+          }
+        }
+      });
+    })(jQuery);
+  }
+);
+</script>
+
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Emily Blogstein</a></h1>
+<h4>A blog for a Bookstein</h4>
+<nav id="main-nav"><ul>
+	<li><a href="/">Blog</a></li>
+	<li><a href="/about">About</a></li>
+	<li><a href="/stuff">Stuff</a></li>
+	<li><a href="/archives">Archive</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/">Blog</a></li>
+	<li><a href="/about">About</a></li>
+	<li><a href="/stuff">Stuff</a></li>
+	<li><a href="/archives">Archive</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:bookstein.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">The Legend of Cassandra</h2>
+	<div class="entry-content"><p><img class="[Cassandra]" src="/images/cassandra.jpeg" width="620" height="372" title="[Cassandra [painting of Cassandra]]" ></p>
+
+<h6>Image: <a href="https://www.theguardian.com/world/2015/jan/26/alexis-tsiprass-victory-speech-cassandra-myth-greek-elections">The Guardian</a></h6>
+
+<p>According to Greek legend, Cassandra was a prophet. She foresaw terrible, tragic futures — but as if that wasn’t enough, she was also cursed to never be believed.</p>
+
+<p>I had always wondered why on earth <a href="http://planetcassandra.org">Apache Cassandra</a> was named after a prophet who was never believed. Doesn’t give you the greatest confidence in their software, no?</p>
+
+<p>But yesterday, I learned a ton about Cassandra from a knowledgeable coworker — and now, the reference to Greek legend makes sense.</p>
+
+<h2>What is Cassandra?</h2>
+
+<p>Cassandra is a distributed data management system built for handling large volumes of I/O with no single point of failure. With Cassandra, your database is just a file system, with files spread out over a number of nodes that are arranged in a cluster.</p>
+
+<p><img class="[Cassandra]" src="/images/cassandra-ring.png" width="219" height="215" title="[Cassandra ring [Cassandra ring]]" ></p>
+
+<h6>Image: PlanetCassandra.org</h6>
+
+<h2>How is it different from MySQL?</h2>
+
+<p>Relational databases like MySQL and Postgres use a binary tree structure to store information. Binary trees are great for reading information quickly — they&rsquo;re a data structure that accommodates binary search, dividing predictable/sortable information in half and search the new half for the desired row. However, adding new rows to a binary tree is kind of ugly. You add the new information as randomly-inserted leaf nodes in the tree and now your binary tree is out of order.</p>
+
+<p>Cassandra solves this problem by getting rid of the binary tree and replacing it with a token ring. In a token ring, you start with a key (like “start time” or “id”) and generate a unique hashed key, an unsigned <code>Long</code> with a value somewhere between -2<sup>64</sup> and 2<sup>63</sup>. The ring is divided into chunks, each of which have a node assigned to it. For example, you might have a chunk of hashed keys assigned to Node 1, another chunk to Node 3, another chunk to Node 2, another chunk to Node 1, another chunk to Node 3, etc. The chunks are distributed in a somewhat random way to try to fairly balance the load — you wouldn’t want a bunch of traffic going to Node 1 and overwhelming it with requests.</p>
+
+<p>But, just like the prophet from Greek legend, never believe Cassandra.</p>
+
+<h2>Can’t trust Cassandra</h2>
+
+<p>Any one node by itself can’t be trusted. In fact, the token ring doesn’t just assign one node to each chunk of hash keys, but a list of nodes in the order in which to try to write the data. For example: chunk 256 => [2,3,1]. This will try to write to Node 2 first, then 3, then 1. The data will be stored on multiple nodes eventually.</p>
+
+<p>Every cluster has a replication factor, a value that determines how many nodes to repeat the data on. For example, if our 3-node cluster has a replication factor (RF) of 3, then data will be stored on all 3 of the nodes. My coworker strongly believes that 3 is the minimum sensible RF — because if any of your nodes ever goes down, then you’d rely on a backup node, and you’d need 1 more node to double-check to verify the data is good. (3 nodes - 1 node = 2 nodes. 1 node for requesting the data, 1 to double-check that the first one is right.)</p>
+
+<p><img class="[Cassandra nodes]" src="/images/nodes.png" width="662" height="482" title="[Cassandra nodes [Cassandra nodes]]" ></p>
+
+<h6>Image: <a href="https://www.hakkalabs.co/articles/how-cassandra-stores-data">HakkaLabs</a></h6>
+
+<h2>Scalable system</h2>
+
+<p>One thing that’s amazing about Cassandra is how easy it is to add a new node and therefore add capacity to a cluster. You add the provisioned server to the cluster by simply starting Cassandra on the server (it’s a Java app), then adding its IP address to the list of known nodes. The Cassandra node gets the schema information from the “seed” nodes (the seed nodes are just the nodes, listed by IP address, found in the Cassandra config under “seeds”), the token ring breaks and re-forms to include the new node, and the new node begins streaming data from older nodes. Once it’s joined the cluster and owns all the information it’s expected to own, then it’s ready to receive traffic, and you’ve just added a terabyte of available storage space to your database.</p>
+
+<p>There are no masters, there are no replicas. Just nodes.</p>
+
+<p>It’s a cool system. The co-op nerd side of me loves the hierarchy-free model based on negotiation, shared ownership, and consent among nodes.</p>
+
+<p>However, there are some serious drawbacks to using Cassandra.</p>
+
+<h2>What’s wrong with Cassandra?</h2>
+
+<p>The biggest downside of Cassandra that has come up so far in conversation: it was designed to solve the problem of slow writes. When MySQL or Postgres write something new to a binary tree, that information gets spread out over the binary tree &ndash; it&rsquo;s not all in one place. Cassandra, on the other hand, writes new information all together. This is convenient when your model of storage is a spinning hard disk drive, where you&rsquo;d want all the writes to be together.</p>
+
+<p>But with the advent of solid-state drives, this problem might feel a little irrelevant. And given that Cassandra requires a lot of specialized knowledge outside the comfort zone of people who understand SQL really well, there might not be enough of an incentive to make the switch &ndash; or to even stop using Cassandra after having started.</p>
+
+<hr />
+
+<h4>Sources:</h4>
+
+<ul>
+<li><a href="http://www.planetcassandra.org/what-is-apache-cassandra/">http://www.planetcassandra.org/what-is-apache-cassandra/</a></li>
+<li><a href="https://www.hakkalabs.co/articles/how-cassandra-stores-data">https://www.hakkalabs.co/articles/how-cassandra-stores-data</a></li>
+<li>My awesome coworker</li>
+</ul>
+
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-09-09T04:58:00-07:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/cassandra/'>cassandra</a>, <a class='category' href='/blog/categories/database/'>database</a>, <a class='category' href='/blog/categories/operations/'>operations</a>
+
+</div>
+
+
+	
+</div></article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+<!---	<a class="addthis_counter addthis_pill_style"></a> --->
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    Emily Bookstein
+
+<br>
+Powered by Octopress.
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>
