@@ -4,7 +4,7 @@
   <title><![CDATA[Emily Blogstein]]></title>
   <link href="http://bookstein.github.io/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2016-09-09T05:39:48-07:00</updated>
+  <updated>2016-09-16T23:18:07-07:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -12,6 +12,63 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Setting goals]]></title>
+    <link href="http://bookstein.github.io/blog/2016/09/16/setting-goals/"/>
+    <updated>2016-09-16T22:13:03-07:00</updated>
+    <id>http://bookstein.github.io/blog/2016/09/16/setting-goals</id>
+    <content type="html"><![CDATA[<p><img class="[SMARTGoals]" src="http://bookstein.github.io/images/SmartGoals.jpg" width="281" height="380" title="[SMART goals [image of SMART goal principles]]" ></p>
+
+<h6>Image: <a href="http://www.cognology.com.au/learning_center/howtowritesmartobj/">Cognology</a></h6>
+
+<h3>SMART goals</h3>
+
+<p>Today my new manager told me he believes measurable goals are overrated.</p>
+
+<p>Hm.</p>
+
+<p>Ever since I started working as a software engineer, I have been fearful of falling behind. Of not knowing enough. Of not being intelligent enough. I set tons of goals for myself as soon as I started my job, hoping to power through the uncertainty and the fear. At first these goals were hugely unhelpful. Not only were my lists of goals paralyzingly <em>long</em> &ndash; multiple pages in a Google doc &ndash; but they demanded time-consuming data-tracking just to know whether or not I was succeeding.</p>
+
+<p>When I worked for <a href="http://causes.com">Causes.com</a> organizing student organizers, I learned about <a href="https://en.wikipedia.org/wiki/SMART_criteria">SMART goals</a> &ndash; goals that are <strong>S</strong>pecific, <strong>M</strong>easurable, <strong>A</strong>chievable, <strong>R</strong>ealistic, and <strong>T</strong>imely. I thought SMART goals sounded so, well, smart. Having recently come from college organizing myself, I thought that a good campus campaign should be concrete, have an end date in sight, and convey a clear story about results &ndash; all things that SMART goals spoke to.</p>
+
+<p>Later, as a software engineer, I assumed that my personal goals should also be SMART. I spent a lot of time trying to think of ways to <em>measure</em> my knowledge and learning. By calculating sheer time spent? By counting the number of bonus study sessions per week? By recording a thing I learned every day? By counting numbers of pull requests, pairing sessions, projects completed on my own? I asked my most goal-oriented coworkers to help me craft my goals and strategies, I tried to institute new practices, I kept a daily log of things I&rsquo;d learned or accomplished.</p>
+
+<p>But in the end, my goals didn&rsquo;t act as the solid guideposts I was hoping for. They were worthwhile, for sure, because they forced me to clarify my challenges and intentions. But the act of setting those goals didn&rsquo;t get me much closer to the knowledge and skills &ndash; <em>or</em> the feelings of safety and progress &ndash; that I was after.</p>
+
+<h3>Measurable goals are overrated</h3>
+
+<p>At first, when my manager told me that measurable goals are overrated, I felt resistant. <em>Goals <strong>should</strong> be measurable,</em> I thought to myself, dismayed. <em>How else can you know that you&rsquo;re meeting them?</em> Especially considering the goals he was suggesting for me:</p>
+
+<ul>
+<li>acquiring mastery of UI development (by pairing closely with my new coworkers)</li>
+<li>developing leadership skills (via project ownership)</li>
+</ul>
+
+
+<p> <em>Mastery</em> was an exciting, thrilling word to read in the context of goals. But it made me feel nervous too. How would I know if I was on track for something as giant-sounding as &ldquo;mastery&rdquo;?</p>
+
+<p>When I asked that question, my manager said that forcing nuanced goals to meet requirements for objective measurability squashes out the <em>richness</em> of the overall goal. &ldquo;Mastery of UI development&rdquo; is a very rich goal &ndash; it has many aspects to it, none of which are easily measurable. In fact, it would require a good amount of mental contortion to find opportunities for objectivity.</p>
+
+<p>Hearing his arguments against measurability, I started to feel a sense of relief. This way, I wouldn&rsquo;t set myself up for another failure on improperly-calibrated, falsely-measurable goals. I wouldn&rsquo;t have to add a bunch of tasks to my daily to-do list just to try and track progress. I wouldn&rsquo;t be handing myself yet another yardstick with which to measure myself and find myself lacking.</p>
+
+<p>The part that finally sold me: my manager asserted that <strong>the point of having these goals is to feel excited about coming to work each day.</strong> Thinking about UI mastery (as unmeasurable as it is) is already doing the trick.</p>
+
+<h3>Relational goals</h3>
+
+<p>An interesting aspect of my manager&rsquo;s goals philosophy is that I can meet my goals simply by going about my regular business: by collaborating on code each day with good conscience and good intentions, and by talking with my manager each week in our regular check-in to resolve challenges as they come up.</p>
+
+<p>This aspect reminded me of a term I&rsquo;ve started hearing recently in activist circles, something called <a href="http://southernersonnewground.org/wp-content/uploads/2012/12/SONG-Relational-Organizing.pdf">relational organizing</a>. In relational organizing, as I understand it, human-to-human relationships are the basis upon which community activism and power is built.</p>
+
+<p>Transferring this idea to my goals at work, the relationship is the building block. Not numbers of facts learned in a day, not PR counts. My goals will be met via relationships bewteen me and my coworkers and between myself and my manager. Goals will be achieved not by the individual studying solo and on the side, but by the individual being incorporated into the flow of others' work.</p>
+
+<p>I think I&rsquo;m going to really enjoy coming to work each day with this in mind.</p>
+
+<hr />
+
+<p>P.S. Apologies to SONG if I&rsquo;m misusing the concept of relational organizing!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The Legend of Cassandra]]></title>
