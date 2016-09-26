@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Emily Blogstein]]></title>
+  <title><![CDATA[Blogstein]]></title>
   <link href="http://bookstein.github.io/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2016-09-25T21:17:52-07:00</updated>
+  <updated>2016-09-25T21:25:02-07:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
