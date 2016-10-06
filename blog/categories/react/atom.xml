@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: react | Blogstein]]></title>
+  <link href="http://bookstein.github.io/blog/categories/react/atom.xml" rel="self"/>
+  <link href="http://bookstein.github.io/"/>
+  <updated>2016-10-05T22:01:15-07:00</updated>
+  <id>http://bookstein.github.io/</id>
+  <author>
+    <name><![CDATA[Emily Bookstein]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Child or prop?]]></title>
+    <link href="http://bookstein.github.io/blog/2016/10/05/child-or-prop/"/>
+    <updated>2016-10-05T20:44:25-07:00</updated>
+    <id>http://bookstein.github.io/blog/2016/10/05/child-or-prop</id>
+    <content type="html"><![CDATA[<p>Child or prop? Puppy or bagel?</p>
+
+<p><img class="[Puppy or Bagel]" src="/images/puppyorbagel.jpg" width="450" height="449" title="[Puppy or bagel [puppy or bagel]]" ></p>
+
+<h6>Image: <a href="http://imgur.com/gallery/XsJCNHi">Imgur</a></h6>
+
+<p>Once we get past the amazing likeness of puppies and bagels: let&rsquo;s talk about the similarities and differences between React children and props.</p>
+
+<p>I initially didn&rsquo;t understand the difference. Why have both, if they&rsquo;re just two different ways to pass around information? When should I use props, and when should I use children?</p>
+
+<h3>Parents vs. Owners</h3>
+
+<p>The key to understanding the distinction is understanding the difference between the owner-ownee relationship and the parent-child relationship.</p>
+
+<p>The <strong>parent-child relationship</strong> is a familiar one. For example, a classic DOM layout:</p>
+
+<pre><code class="html">    &lt;ul id="parent"&gt;
+        &lt;li id="child1"&gt;Child 1&lt;/li&gt;
+        &lt;li id="child2"&gt;Child 2&lt;li&gt;
+    &lt;/ul&gt;
+</code></pre>
+
+<p>The list elements are children of the unordered list. They are literally nested inside the <code>&lt;ul&gt;</code>. In React, too, a child component is literally nested inside the parent: <code>&lt;Parent&gt; &lt;Child /&gt; &lt;/Parent&gt;</code></p>
+
+<p>The <strong>owner-ownee relationship</strong> is a little different. In <a href="https://facebook.github.io/react/docs/multiple-components.html">Facebook&rsquo;s React docs</a> the definition is this:</p>
+
+<blockquote><p>An owner is the component that sets the props of other components. More formally, if a component X is created in component Y&rsquo;s <code>render( )</code> method, it is said that X is <strong>owned</strong> by Y.</p></blockquote>
+
+<p>For example:</p>
+
+<pre><code>    class Engineer extends React.Component {
+        render() {
+            return(
+                &lt;pre&gt;
+                    &lt;CodeSnippet language={this.props.language} codeSmell={this.props.smell} /&gt;
+                &lt;/pre&gt;
+            );
+        }
+    }
+</code></pre>
+
+<p>Here, the <code>CodeSnippet</code> is owned by the <code>Engineer</code>, who renders it and is reponsible for its props. (Let that be a lesson to all of us.)</p>
+
+<p>A parent is not the same as an owner. In the above example, <code>pre</code> is the <strong>parent</strong> of <code>CodeSnippet</code>, because a CodeSnippet is nested inside of a <code>pre</code> tag. But <code>pre</code> is not the owner.</p>
+
+<h3>How to pass in children</h3>
+
+<p>This was perhaps the source of my original confusion about children vs. props: children <em>are</em> actually props. But they are a special kind of prop, with their <a href="https://facebook.github.io/react/docs/top-level-api.html#react.children">own set of utilities</a>. The special prop is <code>this.props.children</code>.</p>
+
+<pre><code>class HasManyChildren extends React.Component {
+  render() {
+      return (
+        &lt;div id="parent"&gt;
+            {this.props.children}
+        &lt;/div&gt;
+      )
+  }
+}
+
+ReactDOM.render(
+  &lt;HasManyChildren&gt;
+        &lt;Child value="1" /&gt;
+        &lt;Child value="2" /&gt;
+  &lt;/HasManyChildren&gt;,
+    document.getElementById('container')
+);
+</code></pre>
+
+<p>Two children are being passed into the parent <code>HasManyChildren</code> &ndash; and can be accessed with <code>this.props.children</code>.</p>
+
+<h3>Which one??</h3>
+
+<p>So when to use children and when to use regular props as a way to pass down information? The best answer I&rsquo;ve heard so far:</p>
+
+<h5>children are for dynamic content</h5>
+
+<p>Just like with a Ruby <code>yield</code>, you can pass in any children to a component and it can access them with <code>{this.props.children}</code>. For example, maybe you want to render a Ninja component when the user hits the <code>/ninja</code> route, but render a Pirate component if the user lands on <code>/pirate</code>. You can use <code>this.props.children</code> to render either set of components in the React Router.
+```javascript
+    // in routes
+    <Route path="ninja" component={NinjaComponent}>
+    <Route path="pirate" component={PirateComponent}></p>
+
+<pre><code>// in app.js
+render() {
+    return (
+      &lt;div&gt;
+        &lt;h1&gt; Pirate or Ninja? &lt;/h1&gt;
+        {this.props.children} // renders either PirateComponent or NinjaComponent
+      &lt;/div&gt;
+    );
+}
+</code></pre>
+
+<pre><code>
+##### props are like arguments that must be passed in
+Props, however, are the pieces required for components to render. Just like a method's arguments are required for a method call, a component must receive props before it can mount. If a Pirate component must have a priate flag to be rendered, you'd better pass one in, matey:
+</code></pre>
+
+<pre><code>&lt;Pirate pirateFlag={this.props.pirateFlag} shipName={this.props.shipName} /&gt;
+</code></pre>
+
+<p>```</p>
+
+<h3>Sources</h3>
+
+<ul>
+<li><a href="http://jaketrent.com/post/send-props-to-children-react/">http://jaketrent.com/post/send-props-to-children-react/</a></li>
+<li><a href="https://facebook.github.io/react/docs/multiple-components.html">https://facebook.github.io/react/docs/multiple-components.html</a></li>
+<li>my awesome coworker</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
