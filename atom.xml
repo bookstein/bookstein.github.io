@@ -4,7 +4,7 @@
   <title><![CDATA[Blogstein]]></title>
   <link href="http://bookstein.github.io/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2016-10-05T22:01:15-07:00</updated>
+  <updated>2016-10-20T19:49:04-07:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -12,6 +12,47 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Navigation Timing API]]></title>
+    <link href="http://bookstein.github.io/blog/2016/10/20/navigation-timing-api/"/>
+    <updated>2016-10-20T18:47:44-07:00</updated>
+    <id>http://bookstein.github.io/blog/2016/10/20/navigation-timing-api</id>
+    <content type="html"><![CDATA[<p>Learning about the Navigation Timing API is surprisingly similar to learning “how the Internet works.” In fact, if I was asked to sketch &ldquo;how the Internet works&rdquo; as a job interview question, I&rsquo;d probably draw a timeline of events pretty similar to this:</p>
+
+<p><img class="[Navigation Timing API]" src="http://bookstein.github.io/images/navtimingapi1.png" width="740" height="353" title="[Navigation Timing API [diagram]]" ></p>
+
+<h6>Image: <a href="https://www.w3.org/TR/navigation-timing/">W3C Navigation Timing</a></h6>
+
+<p>Which, of course, is how the Navigation Timing API views the world, too.</p>
+
+<p>The <a href="https://www.w3.org/TR/navigation-timing/">Navigation Timing API</a> is an API that tracks navigation and page load timing. It’s especially useful for gathering information about the wait time perceived by the end user. Timestamps from along the page-load timeline (see diagram above) are stored in an object in the browser window, <code>window.performance.timing</code>. Doing some simple math using those timestamps can reveal the wait times hidden in parts of the process between clicking a link and seeing the fully-loaded page.</p>
+
+<p>The <code>navigationStart</code> timestamp is collected the moment that the previous document is unloaded and the new page fetch begins. The browser looks in the cache, does a DNS lookup if it can&rsquo;t find an entry, connects to the identified server, sends a request, receives the response (in bytes), and then processes the response into the fully-loaded page. All of these steps, and the transitions between them, are identified by events fired off by the browser. The Navigation Timing API notes these events and stores them as start and end times inside <code>window.performance.timing</code>.</p>
+
+<p>The Navigation Timing API ends with the window’s <code>load</code> event, which fires when the DOM is complete and all images, scripts and links have loaded. However, many webpages continue to fire off AJAX calls after the page has loaded. AJAX calls might even <em>replace</em> additional page loads, as in the case of single-page apps where the full page loads only once.</p>
+
+<p><img class="[Navigation Timing API]" src="http://bookstein.github.io/images/navtimingapi.png" width="740" height="353" title="[Navigation Timing API [diagram]]" ></p>
+
+<p>These asynchronous, post-DOM-load requests might make it harder to understand total page load performance, but it&rsquo;s not too difficult. How long do you wait for an AJAX response? How long does each Javascript callback (a function waiting for an asynchronous request to complete) take to finish running? These wait times can be tracked, too &ndash; although not with the Navigation Timing API. You might want to check out <a href="https://newrelic.com/browser-monitoring">New Relic Browser Monitoring</a>&hellip;</p>
+
+<p><img class="[AJAX calls]" src="http://bookstein.github.io/images/ajax.png" title="[AJAX breakdown [diagram]]" ></p>
+
+<h6>Image: based on screenshot from <a href="https://newrelic.com/browser-monitoring">New Relic Browser - Session Traces</a></h6>
+
+<h3>Various Sources:</h3>
+
+<ul>
+<li><a href="http://developer.telerik.com/featured/introduction-navigation-timing-api/">Intro to the Navigation Timing API (blog post)</a></li>
+<li><a href="https://davidwalsh.name/measuring-performance">Measuring Performance (blog post)</a></li>
+<li><a href="https://blog.newrelic.com/2016/10/17/network-friendly-single-page-apps/">Measuring Performance of Single-Page Apps (blog post)</a></li>
+<li><a href="https://newrelic.com/browser-monitoring">New Relic Browser Monitoring</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onload">About the Onload event (MDN docs)</a></li>
+<li><a href="http://igoro.com/archive/what-really-happens-when-you-navigate-to-a-url/">FYI, a good explanation of &ldquo;how the Internet works&rdquo;</a></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Child or prop?]]></title>
