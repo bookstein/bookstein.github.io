@@ -9,7 +9,7 @@
 
 <meta name="author" content="Emily Bookstein"> 
 
-<meta name="description" content="Learning about the Navigation Timing API is surprisingly similar to learning “how the Internet works.” In fact, if I was asked to sketch &ldquo;how &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="Image: Harry Potter FanArt by fridouw Hermione might have read a whole book on Arithmancy, but the spells that save the day always seem to boil down &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -99,6 +99,249 @@ $(document).ready(
 </header>
 
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/11/01/es6-magic/">
+		
+			3 Handy Spells for the Aspiring ES6 Wizard</a>
+	</h2>
+	<div class="entry-content">
+		<p><img class="[Hermione casting a spell]" src="/images/hermione.jpg" width="338" height="478" title="[Hermione [Hermione]]" ></p>
+
+<h6>Image: <a href="http://harry-potter-fanart.tumblr.com/post/135838347291/hermione-granger-by-fridouw">Harry Potter FanArt by fridouw</a></h6>
+
+<p>Hermione might have read a whole book on Arithmancy, but the spells that save the day always seem to boil down to <em>Alohamora</em>, <em>Expelliarmus</em> and <em>Expecto Patronum</em>.</p>
+
+<p>Just like every wizard needs her shortlist of handy spells, there are a couple of new Javascript features that might just disarm Voldemort, save Hogwarts, and/or beautify your code every damn day.</p>
+
+<p>Here are 3 particularly magical aspects of ES6 that will brighten your day faster than you can say <em>Lumos</em>!</p>
+
+<ul>
+<li><a href="#arrow_functions">arrow functions</a>,</li>
+<li><a href="#destructuring">object destructuring</a></li>
+<li><a href="#variables">variable scoping</a></li>
+</ul>
+
+
+<h3><a name="arrow_functions"></a>Arrow functions</h3>
+
+<p>In addition to defining functions with the <code>function</code> keyword, you can now define functions using arrow notation.</p>
+
+<h4>Old way:</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">doAThing</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">“</span><span class="nx">Doing</span> <span class="nx">a</span> <span class="nx">thing</span> <span class="nx">now</span><span class="s2">&quot;)</span>
+</span><span class='line'><span class="s2">     console.log(“Done&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Arrow way:</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">doAThing</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">“</span><span class="nx">Doing</span> <span class="nx">a</span> <span class="nx">thing</span> <span class="nx">now</span><span class="s2">&quot;)</span>
+</span><span class='line'><span class="s2">     console.log(“Done&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(If you’ve used lambdas in Java 8, the setup will feel familiar.)</p>
+
+<p>Arrow functions have 2 simple benefits and 1 complicated benefit.</p>
+
+<h4>Simple benefit 1: less writing</h4>
+
+<p>We get rid of the <code>function</code> keyword! So fly, so hip!</p>
+
+<h4>Simple benefit 2: implicit returns</h4>
+
+<p>You can write one-liners like this, without curly braces:
+<code>returnAString = () =&gt; “Here's your string”</code></p>
+
+<h4>Complicated benefit: no re-binding of <code>this</code></h4>
+
+<p>Arrow functions should <strong>not</strong> be used as a one-to-one replacement for regular functions because they affect the scope of <code>this</code>.</p>
+
+<p>In old-school Javascript functions, <code>this</code> refers to the local scope.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">div</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="err">‘</span><span class="p">.</span><span class="nx">myDiv</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'><span class="nx">div</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="err">‘</span><span class="nx">click</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="c1">// —&gt; &lt;div class=‘myDiv&#39;&gt; Hi &lt;/div&gt;</span>
+</span><span class='line'><span class="p">})</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>An arrow function doesn&rsquo;t create its own context, so the value of <code>this</code> is simply inherited from the parent scope.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">div</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="err">‘</span><span class="nx">div</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'><span class="nx">div</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="err">‘</span><span class="nx">click</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="c1">// —&gt; window</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So, be careful about using arrow functions, particularly when using event listeners.</p>
+
+<h3><a name="destructuring"></a>Object destructuring</h3>
+
+<p>Object destructuring is super handy. It saves you a lot of writing, and it saves a lot of headaches when it comes to passing arguments into functions and returning values from functions.</p>
+
+<h4>Less writing</h4>
+
+<p>Old way:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">thing1</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">thing1</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">thing2</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">thing2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>New way:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="p">{</span> <span class="nx">thing1</span><span class="p">,</span> <span class="nx">thing2</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">obj</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ES6 simply looks inside <code>obj</code> for properties with names matching <code>thing1</code> and <code>thing2</code> and assigns the correct value.</p>
+
+<h4>Multiple return values</h4>
+
+<p>Object destructuring helps us unpack multiple values returned from a function.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">returnObj</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>     <span class="k">return</span> <span class="p">{</span> <span class="nx">thing1</span><span class="o">:</span> <span class="s1">&#39;red fish&#39;</span><span class="p">,</span> <span class="nx">thing2</span><span class="o">:</span> <span class="s1">&#39;blue fish&#39;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="p">{</span> <span class="nx">thing1</span><span class="p">,</span> <span class="nx">thing2</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">returnObj</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">thing1</span><span class="p">)</span> <span class="c1">// &#39;red fish&#39;</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">thing2</span><span class="p">)</span>  <span class="c1">// &#39;blue fish&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Passing in arguments</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">tipCalculator</span><span class="p">(</span> <span class="p">{</span> <span class="nx">total</span><span class="p">,</span> <span class="nx">tip</span> <span class="o">=</span> <span class="mf">0.20</span><span class="p">,</span> <span class="nx">tax</span> <span class="o">=</span> <span class="mf">0.11</span> <span class="p">}</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>     <span class="k">return</span> <span class="nx">total</span> <span class="o">*</span> <span class="nx">tip</span> <span class="o">+</span> <span class="nx">total</span> <span class="o">*</span> <span class="nx">tax</span> <span class="o">+</span> <span class="nx">total</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">bill</span> <span class="o">=</span> <span class="nx">tipCalculator</span><span class="p">(</span> <span class="p">{</span><span class="nx">tax</span><span class="o">:</span> <span class="mf">0.14</span><span class="p">,</span> <span class="nx">total</span><span class="o">:</span> <span class="mi">200</span><span class="p">}</span> <span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here, we pass in an object to the function <code>tipCalculator</code> and the argument gets destructured inside the function. This allows arguments to be passed in any order — and you can even rely on defaults so you don’t have to pass in every value.</p>
+
+<h3><a name="variables"></a>Var/let/const: variable scoping</h3>
+
+<p>ES6&rsquo;s variable declaration keywords <code>var</code>, <code>let</code> and <code>const</code> allow you to declare variables with a variety of scoping and overwriting rules.</p>
+
+<ul>
+<li><p><code>var</code> is function-scoped</p>
+
+<ul>
+<li>if not declared inside a function, the variable is global</li>
+</ul>
+</li>
+<li><p><code>let</code> has a block scope</p>
+
+<ul>
+<li>the variable is only defined inside whatever block it&rsquo;s in (including <code>if</code> blocks)</li>
+<li>you cannot define same variable multiple times using <code>let</code> in the same scope</li>
+</ul>
+</li>
+<li><p><code>const</code> (“constant”) variables cannot be re-assigned a value</p>
+
+<ul>
+<li>properties of a const <strong>can</strong> be changed though!</li>
+</ul>
+</li>
+</ul>
+
+
+<p>The rule of thumb I’ve been using: by default, assign your variables using <code>const</code> unless you know the value is going to change. (I <code>const</code>antly use <code>const</code>!)</p>
+
+<p>This way, I never accidentally overwrite a variable whose value I never wanted to change, and I am forced to make a conscious decision at the outset about how to use variables.</p>
+
+<p>If I want to declare a variable and set its value later (based on if/else logic, for example), I use <code>let</code>. (I almost never use <code>var</code>.)</p>
+
+<h3>Summary</h3>
+
+<p>ES6 has a ton of awesome, time-saving shortcuts built into it &ndash; shortcuts that any worthy wizard would make sure to add to her spellbook. These magical tools aren’t just esoteric/academic fluff — I use them all the time, and I’m a first year myself.</p>
+
+<p>P.S. If you want a tutorial overview of ES6, I’m really enjoying <a href="https://es6.io/">es6.io</a> by Wes Bos (who inspired some of my examples above). The tutorial is easy to follow, and it not only teaches you about ES6’s new features but is basically a Javascript crash course in itself. It&rsquo;ll totally <em>transfigure</em> your ES6 familiarity!</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-11-01T21:59:17-07:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/es6/'>es6</a>, <a class='category' href='/blog/categories/javascript/'>javascript</a>
+
+</div>
+
+
+	
+</div></article>
 
 
     <article class="post">

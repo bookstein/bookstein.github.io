@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: es6 | Blogstein]]></title>
+  <link href="http://bookstein.github.io/blog/categories/es6/atom.xml" rel="self"/>
+  <link href="http://bookstein.github.io/"/>
+  <updated>2016-11-01T22:53:57-07:00</updated>
+  <id>http://bookstein.github.io/</id>
+  <author>
+    <name><![CDATA[Emily Bookstein]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[3 Handy Spells for the Aspiring ES6 Wizard]]></title>
+    <link href="http://bookstein.github.io/blog/2016/11/01/es6-magic/"/>
+    <updated>2016-11-01T21:59:17-07:00</updated>
+    <id>http://bookstein.github.io/blog/2016/11/01/es6-magic</id>
+    <content type="html"><![CDATA[<p><img class="[Hermione casting a spell]" src="/images/hermione.jpg" width="338" height="478" title="[Hermione [Hermione]]" ></p>
+
+<h6>Image: <a href="http://harry-potter-fanart.tumblr.com/post/135838347291/hermione-granger-by-fridouw">Harry Potter FanArt by fridouw</a></h6>
+
+<p>Hermione might have read a whole book on Arithmancy, but the spells that save the day always seem to boil down to <em>Alohamora</em>, <em>Expelliarmus</em> and <em>Expecto Patronum</em>.</p>
+
+<p>Just like every wizard needs her shortlist of handy spells, there are a couple of new Javascript features that might just disarm Voldemort, save Hogwarts, and/or beautify your code every damn day.</p>
+
+<p>Here are 3 particularly magical aspects of ES6 that will brighten your day faster than you can say <em>Lumos</em>!</p>
+
+<ul>
+<li><a href="#arrow_functions">arrow functions</a>,</li>
+<li><a href="#destructuring">object destructuring</a></li>
+<li><a href="#variables">variable scoping</a></li>
+</ul>
+
+
+<h3><a name="arrow_functions"></a>Arrow functions</h3>
+
+<p>In addition to defining functions with the <code>function</code> keyword, you can now define functions using arrow notation.</p>
+
+<h4>Old way:</h4>
+
+<pre><code class="javascript">function doAThing() {
+     console.log(“Doing a thing now")
+     console.log(“Done")
+}
+</code></pre>
+
+<h4>Arrow way:</h4>
+
+<pre><code class="javascript">doAThing = () =&gt; {
+     console.log(“Doing a thing now")
+     console.log(“Done")
+}
+</code></pre>
+
+<p>(If you’ve used lambdas in Java 8, the setup will feel familiar.)</p>
+
+<p>Arrow functions have 2 simple benefits and 1 complicated benefit.</p>
+
+<h4>Simple benefit 1: less writing</h4>
+
+<p>We get rid of the <code>function</code> keyword! So fly, so hip!</p>
+
+<h4>Simple benefit 2: implicit returns</h4>
+
+<p>You can write one-liners like this, without curly braces:
+<code>returnAString = () =&gt; “Here's your string”</code></p>
+
+<h4>Complicated benefit: no re-binding of <code>this</code></h4>
+
+<p>Arrow functions should <strong>not</strong> be used as a one-to-one replacement for regular functions because they affect the scope of <code>this</code>.</p>
+
+<p>In old-school Javascript functions, <code>this</code> refers to the local scope.</p>
+
+<p>```javascript</p>
+
+<script>
+const div = document.querySelector(‘.myDiv’)
+div.addEventListener(‘click, function() {
+     console.log(this) // —> <div class=‘myDiv'> Hi </div>
+})
+</script>
+
+
+<pre><code>
+An arrow function doesn't create its own context, so the value of `this` is simply inherited from the parent scope.
+</code></pre>
+
+<script>
+const div = document.querySelector(‘div’)
+div.addEventListener(‘click, () => {
+     console.log(this) // —> window
+}
+</script>
+
+
+<pre><code>
+So, be careful about using arrow functions, particularly when using event listeners.
+
+### &lt;a name="destructuring"&gt;&lt;/a&gt;Object destructuring
+
+Object destructuring is super handy. It saves you a lot of writing, and it saves a lot of headaches when it comes to passing arguments into functions and returning values from functions.
+
+#### Less writing
+Old way:
+</code></pre>
+
+<p>var thing1 = obj.thing1
+var thing2 = obj.thing2
+```</p>
+
+<p>New way:
+<code>javascript
+const { thing1, thing2 } = obj
+</code></p>
+
+<p>ES6 simply looks inside <code>obj</code> for properties with names matching <code>thing1</code> and <code>thing2</code> and assigns the correct value.</p>
+
+<h4>Multiple return values</h4>
+
+<p>Object destructuring helps us unpack multiple values returned from a function.</p>
+
+<pre><code class="javascript">function returnObj( ) {
+     return { thing1: 'red fish', thing2: 'blue fish' }
+}
+
+const { thing1, thing2 } = returnObj();
+
+console.log(thing1) // 'red fish'
+console.log(thing2)  // 'blue fish'
+</code></pre>
+
+<h4>Passing in arguments</h4>
+
+<pre><code class="javascript">function tipCalculator( { total, tip = 0.20, tax = 0.11 } ) {
+     return total * tip + total * tax + total
+}
+
+const bill = tipCalculator( {tax: 0.14, total: 200} )
+</code></pre>
+
+<p>Here, we pass in an object to the function <code>tipCalculator</code> and the argument gets destructured inside the function. This allows arguments to be passed in any order — and you can even rely on defaults so you don’t have to pass in every value.</p>
+
+<h3><a name="variables"></a>Var/let/const: variable scoping</h3>
+
+<p>ES6&rsquo;s variable declaration keywords <code>var</code>, <code>let</code> and <code>const</code> allow you to declare variables with a variety of scoping and overwriting rules.</p>
+
+<ul>
+<li><p><code>var</code> is function-scoped</p>
+
+<ul>
+<li>if not declared inside a function, the variable is global</li>
+</ul>
+</li>
+<li><p><code>let</code> has a block scope</p>
+
+<ul>
+<li>the variable is only defined inside whatever block it&rsquo;s in (including <code>if</code> blocks)</li>
+<li>you cannot define same variable multiple times using <code>let</code> in the same scope</li>
+</ul>
+</li>
+<li><p><code>const</code> (“constant”) variables cannot be re-assigned a value</p>
+
+<ul>
+<li>properties of a const <strong>can</strong> be changed though!</li>
+</ul>
+</li>
+</ul>
+
+
+<p>The rule of thumb I’ve been using: by default, assign your variables using <code>const</code> unless you know the value is going to change. (I <code>const</code>antly use <code>const</code>!)</p>
+
+<p>This way, I never accidentally overwrite a variable whose value I never wanted to change, and I am forced to make a conscious decision at the outset about how to use variables.</p>
+
+<p>If I want to declare a variable and set its value later (based on if/else logic, for example), I use <code>let</code>. (I almost never use <code>var</code>.)</p>
+
+<h3>Summary</h3>
+
+<p>ES6 has a ton of awesome, time-saving shortcuts built into it &ndash; shortcuts that any worthy wizard would make sure to add to her spellbook. These magical tools aren’t just esoteric/academic fluff — I use them all the time, and I’m a first year myself.</p>
+
+<p>P.S. If you want a tutorial overview of ES6, I’m really enjoying <a href="https://es6.io/">es6.io</a> by Wes Bos (who inspired some of my examples above). The tutorial is easy to follow, and it not only teaches you about ES6’s new features but is basically a Javascript crash course in itself. It&rsquo;ll totally <em>transfigure</em> your ES6 familiarity!</p>
+]]></content>
+  </entry>
+  
+</feed>
