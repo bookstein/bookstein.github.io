@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://bookstein.github.io/blog/2016/11/30/testing-react-router-1/</loc>
+<lastmod>2016-11-30T10:20:31-08:00</lastmod>
+</url>
+<url>
 <loc>http://bookstein.github.io/blog/2016/11/01/es6-magic/</loc>
 <lastmod>2016-11-01T21:59:17-07:00</lastmod>
 </url>
@@ -85,5 +89,8 @@
 </url>
 <url>
 <loc>http://bookstein.github.io/blog/categories/es6/</loc>
+</url>
+<url>
+<loc>http://bookstein.github.io/blog/categories/react-router/</loc>
 </url>
 </urlset>

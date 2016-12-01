@@ -4,7 +4,7 @@
   <title><![CDATA[Category: react | Blogstein]]></title>
   <link href="http://bookstein.github.io/blog/categories/react/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2016-11-01T22:53:57-07:00</updated>
+  <updated>2016-11-30T18:57:06-08:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -12,6 +12,97 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Testing React Router: Part 1]]></title>
+    <link href="http://bookstein.github.io/blog/2016/11/30/testing-react-router-1/"/>
+    <updated>2016-11-30T10:20:31-08:00</updated>
+    <id>http://bookstein.github.io/blog/2016/11/30/testing-react-router-1</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m a believer.</p>
+
+<p>I have joined the ranks of those who see the URL as the One Almighty Source of Truth. In this vein, we use <a href="https://github.com/ReactTraining/react-router">React Router</a> to determine which components and data to show.</p>
+
+<p>But even though I&rsquo;m a believer, I&rsquo;m also a cynic. Let&rsquo;s put our faith in the URL to the test.</p>
+
+<h3>Why should we test our routing?</h3>
+
+<p>With the URL as the source of truth, we can expect the view to significantly change depending on the URL path or query params. Shouldn&rsquo;t we have tests that ensure the correct components show up? Especially if you have complicated routing: nested routes, query params, optional routes, etc.</p>
+
+<h3>Initial exploration</h3>
+
+<p>The folks who wrote React Router wrote a <a href="https://github.com/ReactTraining/react-router/blob/master/modules/__tests__/matchRoutes-test.js">set of tests</a> that verify whether a matching route can be found for a given path.</p>
+
+<p>For example, here&rsquo;s a test that verifies that a path of <code>/users</code> will yield the correct set of matching routes.</p>
+
+<pre><code class="javascript">routes = [
+ RootRoute = {
+    childRoutes: [
+      UsersRoute = {
+        path: 'users',
+        indexRoute: (UsersIndexRoute = {}),
+        childRoutes: [
+          UserRoute = {
+            path: ':userID',
+...
+]
+
+describe('when the location matches an index route', function () {
+    it('matches the correct routes', function (done) {
+        matchRoutes(routes, createLocation('/users'), function (error, match) {
+          expect(match).toExist()
+          expect(match.routes).toEqual([ RootRoute, UsersRoute, UsersIndexRoute ])
+          done()
+        })
+    })
+    ...
+</code></pre>
+
+<h6>See the full React Router test <a href="https://github.com/ReactTraining/react-router/blob/master/modules/__tests__/matchRoutes-test.js">here</a>.</h6>
+
+<p>I couldn&rsquo;t find much out there on the Interwebz about testing React routes. So, my first step was to see if I could just get React Router&rsquo;s &ldquo;matching routes&rdquo; test suite working for an existing app that has its own simple front-end routing.</p>
+
+<p>It was a bit of a struggle.</p>
+
+<p>The most important part was to convert the routes in <code>routes.js</code> to JSON instead of JSX. This is because React Router&rsquo;s tests use a <code>matchRoutes</code> testing tool that rely on routes having a certain structure. Their test suite recreates a complicated nest of test routes inside the test itself. If I were writing my own routes test, it would be pretty annoying to have to update a handmade list of routes in the test every time the app&rsquo;s routes changed. Writing routes as JSON will allow me to simply import my routes from the routes file into the test.</p>
+
+<pre><code class="javascript">// in routes.js
+
+export const Routes = [
+    {
+        component: App,
+        onEnter: trackUserId,
+        childRoutes: [
+            {
+                path: "/",
+                component: "LandingPageComponent"
+            },
+            {
+                path: "/buy",
+                component: "BuyComponent"
+            },
+        ]
+    }
+]
+</code></pre>
+
+<pre><code class="javascript">// in __test__/routes_spec.js
+
+import { Routes } from '../routes'
+
+...
+
+matchRoutes(Routes, createLocation('/buy'), function(error, match) { ... })
+</code></pre>
+
+<h3>What to test?</h3>
+
+<p>I don&rsquo;t want my routes test to test <em>React Router</em>&rsquo;s logic &ndash; it&rsquo;s not my place to make sure that React Router knows how to find a matching route from a given path. I want to test the logic that I&rsquo;m creating for the app. So, what I <em>do</em> want to test is that all the right information is displayed on the page if I hit the &ldquo;/&rdquo; path versus the &ldquo;/buy&rdquo; path.</p>
+
+<p>For example, I could check that loading &ldquo;/buy&rdquo; adds the <code>SearchWidget</code> and <code>ShoppingCartWidget</code> to the page, and that hitting the root &ldquo;/&rdquo; shows the <code>FullPageSplashComponent</code>.</p>
+
+<p>But HOW to do that? Stay tuned, more to come.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Child or prop?]]></title>
