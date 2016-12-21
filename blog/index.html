@@ -9,7 +9,7 @@
 
 <meta name="author" content="Emily Bookstein"> 
 
-<meta name="description" content="I&rsquo;m a believer. I have joined the ranks of those who see the URL as the One Almighty Source of Truth. In this vein, we use React Router to &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="Image: Quickmeme My last post was titled “Testing React Router: Part 1.” Which seems to imply there&rsquo;s a Part 2 about React Router. But I want &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -99,6 +99,152 @@ $(document).ready(
 </header>
 
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/12/20/if-i-only-had-a-test/">
+		
+			React Testing, Part 2</a>
+	</h2>
+	<div class="entry-content">
+		<p><img class="[If I only had a test]" src="/images/if_I_only_had_a_brain.png" width="523" height="392" title="[Scarecrow [Scarecrow]]" ></p>
+
+<h6>Image: <a href="https://www.google.com/url?sa=i&amp;rct=j&amp;q=&amp;esrc=s&amp;source=images&amp;cd=&amp;cad=rja&amp;uact=8&amp;ved=0ahUKEwiNptKjpYPRAhUY5WMKHX-gBY4QjB0IBg&amp;url=http%3A%2F%2Fwww.quickmeme.com%2Fmeme%2F36fr5j&amp;psig=AFQjCNEw6QsdkwrYPoAtlLuhn89jrul6JQ&amp;ust=1482341155914045">Quickmeme</a></h6>
+
+<h5>My last post was titled “Testing React Router: Part 1.” Which seems to imply there&rsquo;s a Part 2 about React Router. But I want to… er… <em>re-route</em> the conversation. This post is about testing React components and how integration tests can save the day.</h5>
+
+<hr />
+
+<p><em>The project was almost complete. My time as team captain was almost over. Victory was in sight&hellip;</em></p>
+
+<p>My team had been working on Source Maps &ldquo;Dragondrop,&rdquo; a UI feature allowing users to drag and drop <a href="https://www.html5rocks.com/en/tutorials/developertools/sourcemaps/">source maps</a> to unminify Javascript error stack traces. As the project&rsquo;s team captain, I had generated a list of test cases and scheduled a team &ldquo;bug hunt&rdquo; to go through them manually.</p>
+
+<p>The test plan looked something like this:</p>
+
+<blockquote><ol>
+<li>Happy path! Drag and drop the correct source map onto the stack trace.
+Verify unminified line #, column #, and source code.</li>
+<li>Drag and drop the wrong source map onto the stack trace.
+Verify error message banner saying wrong file.</li>
+<li>Drag and drop a source map with no source content.
+Verify warning banner saying no source content, but correctly unminified line # and column #.</li>
+</ol>
+</blockquote>
+
+<p>Etc.</p>
+
+<p>Our bug hunt revealed that most test cases passed! But it also revealed a subtly bug&hellip; and that final bug fix ballooned into taking multiple extra days.</p>
+
+<p><em>How could we have caught this UI issue earlier? And what could we do to prevent regressions while we refactored the code to fix the problem?</em></p>
+
+<h3>Testing Front-End Applications Is About User Perspective</h3>
+
+<p>React child components re-render when there&rsquo;s a state change in a parent component. In our app, these children were <a href="https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0#.ouvy9otiu">presentational components</a> called <code>StackTraceItems</code> &ndash; the individual line items of a stack trace. The parent was <code>StackTrace</code>, the container component at the top level of the hierarchy, where we stored uploaded source maps as state.</p>
+
+<p><img class="[source map state]" src="/images/sourcemap_state.png" width="470" height="433" title="[Source maps [source maps]]" ></p>
+
+<h6>Source maps are stored in <code>StackTrace</code> state.</h6>
+
+<p>Here was the problem: when a user dragged in the <em>wrong</em> source map, <code>StackTrace</code> stored the file, applied the source map to the minified stack trace, and then confirmed whether or not unminification had been successful. Even if it was <em>not</em> successful, the state change in <code>StackTrace</code> caused <code>StackTraceItems</code> to update as if a correct source map had been uploaded.</p>
+
+<p>Adding insult to injury, all of our tests were passing.
+<img class="[No good]" src="/images/no_good.png" width="25" height="25" title="[No good [No good]]" ></p>
+
+<p>Our tests were passing, all right, but they were all unit tests. All they did was confirm that components rendered properly given certain props, and that user interaction worked as expected. The problem we were facing was that, <em>from a user perspective,</em> the app looked broken.</p>
+
+<h3>How to Write Front-end Tests That Save You Time and Anxiety</h3>
+
+<h4>0. Have the right tools</h4>
+
+<p>These are the libraries and tools that allowed us to write all the React tests we wanted:</p>
+
+<ul>
+<li><a href="https://github.com/airbnb/enzyme">Enzyme (React Test Utilities)</a></li>
+<li><a href="http://chaijs.com/api/assert/">Chai Assertion Library</a></li>
+<li><a href="http://sinonjs.org/">Sinon: Test Spies and Mocks</a></li>
+</ul>
+
+
+<h4>1. Have a basic set of unit tests for every component</h4>
+
+<p>Unit tests are great for testing components in isolation. These tests tell you whether the component renders at all, and that it does <em>X</em> when you click it.</p>
+
+<p>Unit tests should check that:</p>
+
+<ul>
+<li>component shallowly renders, given props (Enzyme&rsquo;s <code>shallow</code>)</li>
+<li>user interaction works as expected</li>
+<li>elements that you want to show/hide will appear or disappear depending on props</li>
+</ul>
+
+
+<p>Keep unit tests basic. And don&rsquo;t rely on unit tests alone.</p>
+
+<h4>2. Add integration tests for all major user flows</h4>
+
+<p>Integration tests are necessary for testing actual user experience. After all, your user is going to experience your app as an holistic piece of software, not in the form of isolated components.</p>
+
+<p>If your app is structured to have just <strong>one source of truth</strong> &ndash; where high-level state changes trigger a cascade of updates to lower-level components &ndash; it&rsquo;s easy to test.</p>
+
+<p>Integration tests should:</p>
+
+<ul>
+<li>deep-render your components (Enzyme&rsquo;s <code>mount</code>)</li>
+<li>call <code>setState</code> on your top-level stateful component to trigger the changes you want to test</li>
+<li>check for props passed to presentational components, thereby validating what we want the user to <strong>see</strong> on the page</li>
+</ul>
+
+
+<p>What clues do you find yourself looking for when you manually test something? What tells you that a code change worked or not? Check for the props behind those visual cues in your integration tests. Your tests should impersonate your user&rsquo;s eyes.</p>
+
+<blockquote><p>&ldquo;Unit testing is great: it’s the best way to see if an algorithm does the right thing every time, or to check our input validation logic, or data transformations, or any other isolated operation. Unit testing is perfect for fundamentals.
+But front-end code isn’t about manipulating data. It’s about user events and rendering the right views at the right time. Front-ends are about users.&rdquo;
+&ndash; <a href="https://www.toptal.com/react/how-react-components-make-ui-testing-easy">Toptal.com</a></p></blockquote>
+
+<h4>3. Don&rsquo;t leave integration tests until the end</h4>
+
+<p>We were about 2/3 of the way through the project when I wrote up our bug-hunt test plan. The team went through the test plan twice in QA bug hunts, where it was easy as pie to find the last remaining bugs and UX fixes.</p>
+
+<p>But that test plan should have doubled as an outline for integration tests right away. In fact, writing the integration tests should have happened at <em>about the same point in the project</em> as coming up with the test plan. That way, all that high-level testing would have been automated for future use, and at a point in the project when we had a good sense of our app&rsquo;s major user flows and potential pitfalls!</p>
+
+<h3>In Summary</h3>
+
+<p>Unit tests are a great baseline. But we needed <strong>integration tests</strong> to allow us to refactor boldly, as well as save us time in manual testing along the way.</p>
+
+<p>Writing tests during a fast-paced project always feels like a roadblock on your journey down the yellow-brick road. But taking that time might be the only way you get back to Kansas all in one piece.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-12-20T09:25:52-08:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/react/'>react</a>
+
+</div>
+
+
+	
+</div></article>
 
 
     <article class="post">
