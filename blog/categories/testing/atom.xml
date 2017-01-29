@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: testing | Blogstein]]></title>
+  <link href="http://bookstein.github.io/blog/categories/testing/atom.xml" rel="self"/>
+  <link href="http://bookstein.github.io/"/>
+  <updated>2017-01-28T18:06:47-08:00</updated>
+  <id>http://bookstein.github.io/</id>
+  <author>
+    <name><![CDATA[Emily Bookstein]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Testing an Express Server]]></title>
+    <link href="http://bookstein.github.io/blog/2017/01/28/testing-an-express-server/"/>
+    <updated>2017-01-28T17:41:40-08:00</updated>
+    <id>http://bookstein.github.io/blog/2017/01/28/testing-an-express-server</id>
+    <content type="html"><![CDATA[<p>A couple weeks ago, I wrote a suite of tests for a new Node-Express service.</p>
+
+<p>Up until that point, all the JS testing I&rsquo;d done was for <a href="https://bookstein.github.io/blog/2016/12/20/if-i-only-had-a-test/">React components</a>. Writing tests for an Express app is a little different, but was actually really fun and easy with the right tools. So here&rsquo;s a little write-up on some testing tools and tips for backend Javascript!</p>
+
+<h3>Tools</h3>
+
+<p>You will need one or more of the following tools:</p>
+
+<ul>
+<li><a href="https://mochajs.org/">Mocha</a>: a test runner. In package.json, simply add <code>"test": "mocha"</code> under &ldquo;scripts&rdquo; and all tests in the <code>test</code> directory will run.</li>
+<li><a href="chaijs.com/">Chai</a>: an assertions library for Javascript, offering both an expect API and an assert API.</li>
+<li><a href="https://github.com/visionmedia/supertest">Supertest</a>: an HTTP testing library that lets you easily send HTTP requests to a local server.</li>
+<li><a href="www.node-tap.org/">Node-tap</a>: a test library implementing the Test-Anything-Protocol for Node.</li>
+</ul>
+
+
+<h3>Most Valuable Player: Supertest</h3>
+
+<p>My favorite new tool on this list is the Supertest library. It is SO easy to hit each Express endpoint with a Supertest request and examine the response.</p>
+
+<p>The way it works: require Supertest and pass it an Express application. This returns a supertest object onto which other methods can be chained. For example, you can set attributes with &ldquo;get(&lsquo;/path&rsquo;)&rdquo; or &ldquo;set(&lsquo;Content-Type&rsquo;, &lsquo;application/json&rsquo;)&rdquo; that modify both the object and your eventual request to the server. Expectations for the response are also be chained onto the request.</p>
+
+<p>With mocha/chai/supertest:
+<code>javascript
+const request = require(‘supertest’)
+const app = require('../app')
+it('gets a 200 response', function (done) {
+        request(app) // this returns a SuperTest object
+        .get(‘/data’)
+        .set('Content-Type', 'application/json')
+        .expect(200)
+        .end(done)
+})
+</code></p>
+
+<h3>Asynchronicity</h3>
+
+<p>One interesting aspect of writing tests for an Express server is the fact that your tests must run asynchronously. After all, you&rsquo;re sending a request to your server; if your tests proceeded onwards full steam ahead, you might run into an expectation that checks for a response before the response has even arrived. Mocha also needs wait for the current test to finish before heading off to other tests.</p>
+
+<p>Mocha has two ways of handling asynchronous tests:</p>
+
+<ul>
+<li>pass in a <code>done</code> callback that is called when the test ends, or</li>
+<li>use Mocha&rsquo;s built-in Promise handling.</li>
+</ul>
+
+
+<p>Now that Mocha actually handles Promises in-house, it&rsquo;s considered better practice to use <code>.then</code> and <code>.catch</code> rather than <code>.end(done)</code>.</p>
+
+<p>With mocha/chai/supertest:
+<code>javascript
+const request = require(‘supertest’)
+const app = require('../app')
+it('gets a 200 response', function () {
+        request(app)
+        .get(‘/data’)
+        .then((res) =&gt; {
+           if (!(res.status === 200)) { throw new Error } // make sure to actually throw an error so the test fails
+        })
+        .catch(err =&gt; {throw err})
+})
+</code></p>
+
+<p>Node-tap can also be used this way, with <code>.then</code> and <code>.catch</code> callbacks on a Promise.</p>
+
+<p>node-tap/supertest:
+<code>javascript
+const request = require(‘supertest’)
+const test = require('tap').test
+const app = require('../app')
+test(‘gets a 200 response', (t) =&gt; {
+  t.plan(1)
+  request(app)
+    .get(‘/data')
+    .then((res) =&gt; {
+      t.equal(res.status, 200)
+    })
+    .catch((err) =&gt; {
+      t.fail(err)
+    })
+})
+</code></p>
+
+<p>Now sit back, relax, and watch your tests run.</p>
+]]></content>
+  </entry>
+  
+</feed>

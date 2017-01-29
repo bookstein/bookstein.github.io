@@ -4,7 +4,7 @@
   <title><![CDATA[Blogstein]]></title>
   <link href="http://bookstein.github.io/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2017-01-04T22:37:48-08:00</updated>
+  <updated>2017-01-28T18:06:47-08:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -12,6 +12,134 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Testing an Express Server]]></title>
+    <link href="http://bookstein.github.io/blog/2017/01/28/testing-an-express-server/"/>
+    <updated>2017-01-28T17:41:40-08:00</updated>
+    <id>http://bookstein.github.io/blog/2017/01/28/testing-an-express-server</id>
+    <content type="html"><![CDATA[<p>A couple weeks ago, I wrote a suite of tests for a new Node-Express service.</p>
+
+<p>Up until that point, all the JS testing I&rsquo;d done was for <a href="https://bookstein.github.io/blog/2016/12/20/if-i-only-had-a-test/">React components</a>. Writing tests for an Express app is a little different, but was actually really fun and easy with the right tools. So here&rsquo;s a little write-up on some testing tools and tips for backend Javascript!</p>
+
+<h3>Tools</h3>
+
+<p>You will need one or more of the following tools:</p>
+
+<ul>
+<li><a href="https://mochajs.org/">Mocha</a>: a test runner. In package.json, simply add <code>"test": "mocha"</code> under &ldquo;scripts&rdquo; and all tests in the <code>test</code> directory will run.</li>
+<li><a href="chaijs.com/">Chai</a>: an assertions library for Javascript, offering both an expect API and an assert API.</li>
+<li><a href="https://github.com/visionmedia/supertest">Supertest</a>: an HTTP testing library that lets you easily send HTTP requests to a local server.</li>
+<li><a href="www.node-tap.org/">Node-tap</a>: a test library implementing the Test-Anything-Protocol for Node.</li>
+</ul>
+
+
+<h3>Most Valuable Player: Supertest</h3>
+
+<p>My favorite new tool on this list is the Supertest library. It is SO easy to hit each Express endpoint with a Supertest request and examine the response.</p>
+
+<p>The way it works: require Supertest and pass it an Express application. This returns a supertest object onto which other methods can be chained. For example, you can set attributes with &ldquo;get(&lsquo;/path&rsquo;)&rdquo; or &ldquo;set(&lsquo;Content-Type&rsquo;, &lsquo;application/json&rsquo;)&rdquo; that modify both the object and your eventual request to the server. Expectations for the response are also be chained onto the request.</p>
+
+<p>With mocha/chai/supertest:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="err">‘</span><span class="nx">supertest</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../app&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="nx">it</span><span class="p">(</span><span class="s1">&#39;gets a 200 response&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">request</span><span class="p">(</span><span class="nx">app</span><span class="p">)</span> <span class="c1">// this returns a SuperTest object</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="err">‘</span><span class="o">/</span><span class="nx">data</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">expect</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Asynchronicity</h3>
+
+<p>One interesting aspect of writing tests for an Express server is the fact that your tests must run asynchronously. After all, you&rsquo;re sending a request to your server; if your tests proceeded onwards full steam ahead, you might run into an expectation that checks for a response before the response has even arrived. Mocha also needs wait for the current test to finish before heading off to other tests.</p>
+
+<p>Mocha has two ways of handling asynchronous tests:</p>
+
+<ul>
+<li>pass in a <code>done</code> callback that is called when the test ends, or</li>
+<li>use Mocha&rsquo;s built-in Promise handling.</li>
+</ul>
+
+
+<p>Now that Mocha actually handles Promises in-house, it&rsquo;s considered better practice to use <code>.then</code> and <code>.catch</code> rather than <code>.end(done)</code>.</p>
+
+<p>With mocha/chai/supertest:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="err">‘</span><span class="nx">supertest</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../app&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="nx">it</span><span class="p">(</span><span class="s1">&#39;gets a 200 response&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">request</span><span class="p">(</span><span class="nx">app</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="err">‘</span><span class="o">/</span><span class="nx">data</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>           <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">))</span> <span class="p">{</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="p">}</span> <span class="c1">// make sure to actually throw an error so the test fails</span>
+</span><span class='line'>        <span class="p">})</span>
+</span><span class='line'>        <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="k">throw</span> <span class="nx">err</span><span class="p">})</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Node-tap can also be used this way, with <code>.then</code> and <code>.catch</code> callbacks on a Promise.</p>
+
+<p>node-tap/supertest:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="err">‘</span><span class="nx">supertest</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">test</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;tap&#39;</span><span class="p">).</span><span class="nx">test</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../app&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="nx">test</span><span class="p">(</span><span class="err">‘</span><span class="nx">gets</span> <span class="nx">a</span> <span class="mi">200</span> <span class="nx">response</span><span class="s1">&#39;, (t) =&gt; {</span>
+</span><span class='line'><span class="s1">  t.plan(1)</span>
+</span><span class='line'><span class="s1">  request(app)</span>
+</span><span class='line'><span class="s1">    .get(‘/data&#39;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">t</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>    <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">t</span><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now sit back, relax, and watch your tests run.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Express is adorbs]]></title>
