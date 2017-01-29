@@ -4,7 +4,7 @@
   <title><![CDATA[Blogstein]]></title>
   <link href="http://bookstein.github.io/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2017-01-28T18:06:47-08:00</updated>
+  <updated>2017-01-28T18:10:36-08:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -38,7 +38,7 @@
 
 <p>My favorite new tool on this list is the Supertest library. It is SO easy to hit each Express endpoint with a Supertest request and examine the response.</p>
 
-<p>The way it works: require Supertest and pass it an Express application. This returns a supertest object onto which other methods can be chained. For example, you can set attributes with &ldquo;get(&lsquo;/path&rsquo;)&rdquo; or &ldquo;set(&lsquo;Content-Type&rsquo;, &lsquo;application/json&rsquo;)&rdquo; that modify both the object and your eventual request to the server. Expectations for the response are also be chained onto the request.</p>
+<p>The way it works: require Supertest and pass it an Express application. This returns a supertest object onto which other methods can be chained. For example, you can set attributes with &ldquo;get(&lsquo;/path&rsquo;)&rdquo; or &ldquo;set(&lsquo;Content-Type&rsquo;, &lsquo;application/json&rsquo;)&rdquo; that modify both the object and your eventual request to the server. Expectations for the response are also chained onto the supertest object.</p>
 
 <p>With mocha/chai/supertest:</p>
 
@@ -77,7 +77,7 @@
 
 <p>Now that Mocha actually handles Promises in-house, it&rsquo;s considered better practice to use <code>.then</code> and <code>.catch</code> rather than <code>.end(done)</code>.</p>
 
-<p>With mocha/chai/supertest:</p>
+<p>With mocha/supertest:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
