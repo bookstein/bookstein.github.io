@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: node | Blogstein]]></title>
+  <link href="http://bookstein.github.io/blog/categories/node/atom.xml" rel="self"/>
+  <link href="http://bookstein.github.io/"/>
+  <updated>2017-02-09T21:27:07-08:00</updated>
+  <id>http://bookstein.github.io/</id>
+  <author>
+    <name><![CDATA[Emily Bookstein]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Whoop Whoop! Event Loop!]]></title>
+    <link href="http://bookstein.github.io/blog/2017/02/09/event-loop/"/>
+    <updated>2017-02-09T19:33:19-08:00</updated>
+    <id>http://bookstein.github.io/blog/2017/02/09/event-loop</id>
+    <content type="html"><![CDATA[<p>Last week a friend asked me, <em>Is Node is multi-threaded? How would Node do asynchronous work if it&rsquo;s not multi-threaded?</em> Good question! I didn&rsquo;t know the answer.</p>
+
+<p>But as it turns out, Node (and Javascript in general) is <strong>single-threaded</strong>. This means there is only one process, one flow of control. Instead of having multiple threads to process simultaneous work, the Node runtime environment has an ecosystem of interconnected data structures that preserve a fast workflow. At the conceptual center of these structures is the event loop.</p>
+
+<p>All modern Javascript engines rely on an event loop concurrency model, not just Node. So, browser-lovers, read on.</p>
+
+<h2>A stack, a queue, an event loop - oh my!</h2>
+
+<p><img class="[Event loop]" src="/images/event_loop_mdn.png" width="494"></p>
+
+<h6>Image: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop">Mozilla Developers Network</a> (annotations mine)</h6>
+
+<p>This is a simplified diagram of a Javascript runtime. (I added the &ldquo;Web APIs&rdquo; box for browser-related completeness.)</p>
+
+<p>Start with the <strong>stack</strong>. You&rsquo;ve probably been exposed to the stack before, especially in the form of <em>stack traces</em> for  Javascript errors. A stack trace, like the stack itself, is made of the series of functions and local variables that have been pushed onto the stack. Each of those functions and its local variables make up a <em>frame</em> in the call stack.</p>
+
+<p>Functions are added to the stack from the main Javascript program &ndash; or, from the message queue. The <strong>queue</strong> contains callback functions that are ready to be, well, &ldquo;called back.&rdquo; In the browser, callbacks may be associated with DOM events like &ldquo;click&rdquo; or &ldquo;hover&rdquo;; or, for both backend and frontend Javascript, they may be associated with resolved Promises. In fact, they may contain responses from any number of <a href="https://developer.mozilla.org/en-US/docs/Web/API">Web APIs</a>, like <code>timer</code> or the infamous <code>XMLHttpRequest</code>. (I didn&rsquo;t realize those were separate APIs until I started learning about the event loop!) When a message is processed, its callback function gets called and thereby is added to the stack.</p>
+
+<p>The <strong>event loop</strong> is the loop that processes messages in the queue such that the callback functions get pushed onto the stack.</p>
+
+<p>For an animated demo of how the event loop works in the browser, check out <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">Philip Roberts' 2014 JSConf talk</a>.</p>
+
+<p><img class="[Event loop]" src="/images/philip_roberts.png" width="469"></p>
+
+<h6>Image: <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">Philip Roberts, 2014</a></h6>
+
+<h2>Much non-blocking</h2>
+
+<blockquote><p>A very interesting property of the event loop model is that JavaScript, unlike a lot of other languages, never blocks. Handling I/O is typically performed via events and callbacks, so when the application is waiting for an IndexedDB query to return or an XHR request to return, it can still process other things like user input.
+&ndash; <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#Never_blocking">MDN</a></p></blockquote>
+
+<p>Thanks to the event loop model, Javascript is <strong>non-blocking</strong>. That means you don&rsquo;t have to wait for slow tasks to complete before processing other tasks. We just keep pushing or popping frames on and off the stack; some of those function calls add work to someone else&rsquo;s plate (by calling a web API or making HTTP requests, for example), outside of our single process; we receive callbacks in our queue when that external work is done; and whenever the stack has capacity, we pull in those callbacks.</p>
+
+<p>So, even though Javascript is single-threaded, the event loop model allows it to be fast and non-blocking. We just keep grabbing  one thing at a time, one thing at a time, one thing at a time, keep on going forever. We are a <em>machine.</em></p>
+
+<h3>Resources</h3>
+
+<ul>
+<li><a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">JSConf 2014: What the heck is the event loop anyway?</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop">Concurrent model and Event loop - MDN</a></li>
+<li>a knowledgeable coworker who explained aynchronicity and Node</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

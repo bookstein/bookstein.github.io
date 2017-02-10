@@ -1,0 +1,210 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script data-cfasync="false" type="text/javascript" src="//use.typekit.net/axj3cfp.js"></script>
+	<script data-cfasync="false" type="text/javascript">try{Typekit.load();}catch(e){}</script>
+	<meta charset="utf-8">
+	<title>Whoop Whoop! Event Loop!  | Blogstein</title>
+
+<meta name="author" content="Emily Bookstein"> 
+
+<meta name="description" content="Last week a friend asked me, Is Node is multi-threaded? How would Node do asynchronous work if it&rsquo;s not multi-threaded? Good question! I didn& &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Blogstein" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/javascripts/jquery.fancybox.pack.js"></script>
+
+<script language="Javascript" type="text/javascript">
+$(document).ready(
+  function() {
+    (function($) {
+      $(".fancybox[data-content-id]").each(function() {
+        this.href = $(this).data('content-id');
+      });
+      $(".fancybox").fancybox({
+        beforeLoad: function() {
+          var el, 
+              id = $(this.element).data('title-id');
+
+          if (id) {
+            el = $('#' + id);
+
+            if (el.length) {
+              this.title = el.html();
+            }
+          }
+          if ($(this).data('content')) {
+            this.content = $(this).data('content');
+          }
+        },
+        helpers: {
+          title: {
+            type: 'inside'
+          }
+        }
+      });
+    })(jQuery);
+  }
+);
+</script>
+
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Blogstein</a></h1>
+<h4>Emily Bookstein's blog and website</h4>
+<nav id="main-nav"><ul>
+	<li><a href="/">Blog</a></li>
+	<li><a href="/about">About</a></li>
+    <li><a href="/tech-diversity-and-social-justice">Tech + Social Justice</a></li>
+	<li><a href="/stuff">Stuff</a></li>
+	<li><a href="/archives">Archive</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/">Blog</a></li>
+	<li><a href="/about">About</a></li>
+    <li><a href="/tech-diversity-and-social-justice">Tech + Social Justice</a></li>
+	<li><a href="/stuff">Stuff</a></li>
+	<li><a href="/archives">Archive</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:bookstein.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Whoop Whoop! Event Loop!</h2>
+	<div class="entry-content"><p>Last week a friend asked me, <em>Is Node is multi-threaded? How would Node do asynchronous work if it&rsquo;s not multi-threaded?</em> Good question! I didn&rsquo;t know the answer.</p>
+
+<p>But as it turns out, Node (and Javascript in general) is <strong>single-threaded</strong>. This means there is only one process, one flow of control. Instead of having multiple threads to process simultaneous work, the Node runtime environment has an ecosystem of interconnected data structures that preserve a fast workflow. At the conceptual center of these structures is the event loop.</p>
+
+<p>All modern Javascript engines rely on an event loop concurrency model, not just Node. So, browser-lovers, read on.</p>
+
+<h2>A stack, a queue, an event loop - oh my!</h2>
+
+<p><img class="[Event loop]" src="/images/event_loop_mdn.png" width="494"></p>
+
+<h6>Image: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop">Mozilla Developers Network</a> (annotations mine)</h6>
+
+<p>This is a simplified diagram of a Javascript runtime. (I added the &ldquo;Web APIs&rdquo; box for browser-related completeness.)</p>
+
+<p>Start with the <strong>stack</strong>. You&rsquo;ve probably been exposed to the stack before, especially in the form of <em>stack traces</em> for  Javascript errors. A stack trace, like the stack itself, is made of the series of functions and local variables that have been pushed onto the stack. Each of those functions and its local variables make up a <em>frame</em> in the call stack.</p>
+
+<p>Functions are added to the stack from the main Javascript program &ndash; or, from the message queue. The <strong>queue</strong> contains callback functions that are ready to be, well, &ldquo;called back.&rdquo; In the browser, callbacks may be associated with DOM events like &ldquo;click&rdquo; or &ldquo;hover&rdquo;; or, for both backend and frontend Javascript, they may be associated with resolved Promises. In fact, they may contain responses from any number of <a href="https://developer.mozilla.org/en-US/docs/Web/API">Web APIs</a>, like <code>timer</code> or the infamous <code>XMLHttpRequest</code>. (I didn&rsquo;t realize those were separate APIs until I started learning about the event loop!) When a message is processed, its callback function gets called and thereby is added to the stack.</p>
+
+<p>The <strong>event loop</strong> is the loop that processes messages in the queue such that the callback functions get pushed onto the stack.</p>
+
+<p>For an animated demo of how the event loop works in the browser, check out <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">Philip Roberts' 2014 JSConf talk</a>.</p>
+
+<p><img class="[Event loop]" src="/images/philip_roberts.png" width="469"></p>
+
+<h6>Image: <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">Philip Roberts, 2014</a></h6>
+
+<h2>Much non-blocking</h2>
+
+<blockquote><p>A very interesting property of the event loop model is that JavaScript, unlike a lot of other languages, never blocks. Handling I/O is typically performed via events and callbacks, so when the application is waiting for an IndexedDB query to return or an XHR request to return, it can still process other things like user input.
+&ndash; <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#Never_blocking">MDN</a></p></blockquote>
+
+<p>Thanks to the event loop model, Javascript is <strong>non-blocking</strong>. That means you don&rsquo;t have to wait for slow tasks to complete before processing other tasks. We just keep pushing or popping frames on and off the stack; some of those function calls add work to someone else&rsquo;s plate (by calling a web API or making HTTP requests, for example), outside of our single process; we receive callbacks in our queue when that external work is done; and whenever the stack has capacity, we pull in those callbacks.</p>
+
+<p>So, even though Javascript is single-threaded, the event loop model allows it to be fast and non-blocking. We just keep grabbing  one thing at a time, one thing at a time, one thing at a time, keep on going forever. We are a <em>machine.</em></p>
+
+<h3>Resources</h3>
+
+<ul>
+<li><a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">JSConf 2014: What the heck is the event loop anyway?</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop">Concurrent model and Event loop - MDN</a></li>
+<li>a knowledgeable coworker who explained aynchronicity and Node</li>
+</ul>
+
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-02-09T19:33:19-08:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/node/'>node</a>
+
+</div>
+
+
+	
+</div></article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+<!---	<a class="addthis_counter addthis_pill_style"></a> --->
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2017
+
+    Emily Bookstein
+
+<br>
+Powered by Octopress.
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>
