@@ -4,7 +4,7 @@
   <title><![CDATA[Blogstein]]></title>
   <link href="http://bookstein.github.io/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2017-02-09T21:27:07-08:00</updated>
+  <updated>2017-02-23T09:05:49-08:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -12,6 +12,84 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Gosh Yarn It]]></title>
+    <link href="http://bookstein.github.io/blog/2017/02/23/gosh-yarn-it/"/>
+    <updated>2017-02-23T08:26:15-08:00</updated>
+    <id>http://bookstein.github.io/blog/2017/02/23/gosh-yarn-it</id>
+    <content type="html"><![CDATA[<p>You&rsquo;ll never believe it&hellip; A hot new technology has appeared on the Javascript scene.</p>
+
+<h3>What is yarn?</h3>
+
+<p><a href="https://github.com/yarnpkg/yarn">Yarn</a> is a replacement for the <a href="https://www.npmjs.com/package/npm">npm package manager</a>, the  popular tool used to handle the ~300,000 packages in the npm registry.</p>
+
+<p>While Yarn is designed completely replace the npm workflow, it works in concert with the existing package.json: adding or removing packages with Yarn will update both the <em>package.json</em> and <em>yarn.lock</em>.</p>
+
+<p>The main commands you&rsquo;ll need:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">yarn</span>  <span class="c1">// same as npm install</span>
+</span><span class='line'><span class="nx">yarn</span> <span class="nx">add</span>  <span class="c1">// same as npm i --save</span>
+</span><span class='line'><span class="nx">yarn</span> <span class="nx">add</span> <span class="o">--</span><span class="nx">dev</span>  <span class="c1">// same as npm i --save-dev</span>
+</span><span class='line'><span class="nx">yarn</span> <span class="nx">remove</span>  <span class="c1">// same as npm uninstall</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Why bother to switch from tried-and-true npm?</h3>
+
+<p>Locking down the right versions of all your dependencies can be tricky.</p>
+
+<p>For example: I accidentally upgraded <em>react-addons-test-utils</em> to a new version by adding it directly with <code>yarn add react-addons-test-utils</code>. This got the latest version of the package, which meant it no longer had the same version number as <em>react</em> and <em>react-dom</em> &ndash; we had specifically pinned those at an earlier minor version.</p>
+
+<p>When I ran the tests, this error popped up:
+<code>Module not found: Error: Cannot resolve module 'react-dom/lib/ReactTestUtils' in /Users/ebookstein/newrelic/browser/overview-page/node_modules/react-addons-test-utils (module was moved between versions of react-dom)</code></p>
+
+<p>To pin <em>react-addons-test-utils</em> at a specific version, I added the version to the package name like this: <code>yarn add react-addons-test-utils@15.3.0</code>.</p>
+
+<p>Of course, locking down dependencies at the right version numbers is something that <em>npm</em> did for us as well. Why replace it?</p>
+
+<p>There are some minor benefits that came across right away from using yarn instead of npm. For one thing, I no longer have to remember <code>--save</code> &ndash; think of all the time you&rsquo;ll save <em>not</em> pushing branches up to Github only to have your tests fail!</p>
+
+<p>But there are some big-picture benefits too. We were using <em>npm shrinkwrap</em> to stabilize versions and dependencies. But shrinkwrap easily gets out of sync with <em>package.json</em> if you forget to run <code>npm shrinkwrap</code>, and when it fails, it fails silently.</p>
+
+<p>If you want the full-length list of big-picture reasons that Facebook came up with, check out <a href="https://code.facebook.com/posts/1840075619545360/yarn-a-new-package-manager-for-javascript">their blog post about yarn</a>.</p>
+
+<h3>Switching to yarn: a few tricky bits</h3>
+
+<p>Installing yarn itself is easy.</p>
+
+<p><code>brew install yarn</code></p>
+
+<p>Then go to your project directory and run <code>yarn</code> to install all the packages and generate a <em>yarn.lock</em> (similar to Bundler&rsquo;s <em>Gemfile.lock</em> for Ruby).</p>
+
+<p>Migrating from npm to yarn is not totally seamless, however. For some reason, a few packages don’t transition as easily. In particular I had issues with <em>node-sass</em> and <em>phantom-js</em>. In one case, the issue was resolved by specifically adding the module with yarn (<code>yarn add node-sass</code>). In the case of <code>phantom-js</code>, though, we had to add a post-install script to our <em>package.json</em> that would run a phantomjs install script.</p>
+
+<p>Also, if you use Jenkins or other tools that keep a saved copy of your node_modules, you might have to clear out the old node_modules and reinstall.</p>
+
+<p>For Jenkins specifically, try:</p>
+
+<ol>
+<li>clearing the workspace,</li>
+<li>killing the instance of Jenkins, or</li>
+<li>add a post-build step to delete the workspace every time (which therefore runs a complete installation every time)</li>
+</ol>
+
+
+<h3>Fun bits</h3>
+
+<p>Fun fact: yarn preserves many helpful features of npm, like <a href="https://yarnpkg.com/lang/en/docs/cli/link/">symlinking</a>.</p>
+
+<p>For example, if you wanted to use your personal copy of <em>react</em> instead of Facebook’s <em>react</em> (pretend!), then you could run <code>yarn link</code> inside of the react directory, then <code>yarn link react</code> in your project directory. This would then substitute a link to your personal <em>react</em> copy for every <code>require(react)</code>.</p>
+
+<h3>Tying up loose ends</h3>
+
+<p>So far, it&rsquo;s been fun to knit yarn into our development process! Though I&rsquo;m still working through some of the knots&hellip;</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Whoop Whoop! Event Loop!]]></title>

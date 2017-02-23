@@ -9,7 +9,7 @@
 
 <meta name="author" content="Emily Bookstein"> 
 
-<meta name="description" content="Last week a friend asked me, Is Node is multi-threaded? How would Node do asynchronous work if it&rsquo;s not multi-threaded? Good question! I didn& &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="You&rsquo;ll never believe it&hellip; A hot new technology has appeared on the Javascript scene. What is yarn? Yarn is a replacement for the npm &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -101,6 +101,111 @@ $(document).ready(
 	<div id="content" class="inner"><!-- EDIT THIS PAGE FOR ROOT INDEX PAGE (localhost:4000/) -->
 
 
+
+    
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2017/02/23/gosh-yarn-it/">
+		
+			Gosh Yarn It</a>
+	</h2>
+	<div class="entry-content">
+		<p>You&rsquo;ll never believe it&hellip; A hot new technology has appeared on the Javascript scene.</p>
+
+<h3>What is yarn?</h3>
+
+<p><a href="https://github.com/yarnpkg/yarn">Yarn</a> is a replacement for the <a href="https://www.npmjs.com/package/npm">npm package manager</a>, the  popular tool used to handle the ~300,000 packages in the npm registry.</p>
+
+<p>While Yarn is designed completely replace the npm workflow, it works in concert with the existing package.json: adding or removing packages with Yarn will update both the <em>package.json</em> and <em>yarn.lock</em>.</p>
+
+<p>The main commands you&rsquo;ll need:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">yarn</span>  <span class="c1">// same as npm install</span>
+</span><span class='line'><span class="nx">yarn</span> <span class="nx">add</span>  <span class="c1">// same as npm i --save</span>
+</span><span class='line'><span class="nx">yarn</span> <span class="nx">add</span> <span class="o">--</span><span class="nx">dev</span>  <span class="c1">// same as npm i --save-dev</span>
+</span><span class='line'><span class="nx">yarn</span> <span class="nx">remove</span>  <span class="c1">// same as npm uninstall</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Why bother to switch from tried-and-true npm?</h3>
+
+<p>Locking down the right versions of all your dependencies can be tricky.</p>
+
+<p>For example: I accidentally upgraded <em>react-addons-test-utils</em> to a new version by adding it directly with <code>yarn add react-addons-test-utils</code>. This got the latest version of the package, which meant it no longer had the same version number as <em>react</em> and <em>react-dom</em> &ndash; we had specifically pinned those at an earlier minor version.</p>
+
+<p>When I ran the tests, this error popped up:
+<code>Module not found: Error: Cannot resolve module 'react-dom/lib/ReactTestUtils' in /Users/ebookstein/newrelic/browser/overview-page/node_modules/react-addons-test-utils (module was moved between versions of react-dom)</code></p>
+
+<p>To pin <em>react-addons-test-utils</em> at a specific version, I added the version to the package name like this: <code>yarn add react-addons-test-utils@15.3.0</code>.</p>
+
+<p>Of course, locking down dependencies at the right version numbers is something that <em>npm</em> did for us as well. Why replace it?</p>
+
+<p>There are some minor benefits that came across right away from using yarn instead of npm. For one thing, I no longer have to remember <code>--save</code> &ndash; think of all the time you&rsquo;ll save <em>not</em> pushing branches up to Github only to have your tests fail!</p>
+
+<p>But there are some big-picture benefits too. We were using <em>npm shrinkwrap</em> to stabilize versions and dependencies. But shrinkwrap easily gets out of sync with <em>package.json</em> if you forget to run <code>npm shrinkwrap</code>, and when it fails, it fails silently.</p>
+
+<p>If you want the full-length list of big-picture reasons that Facebook came up with, check out <a href="https://code.facebook.com/posts/1840075619545360/yarn-a-new-package-manager-for-javascript">their blog post about yarn</a>.</p>
+
+<h3>Switching to yarn: a few tricky bits</h3>
+
+<p>Installing yarn itself is easy.</p>
+
+<p><code>brew install yarn</code></p>
+
+<p>Then go to your project directory and run <code>yarn</code> to install all the packages and generate a <em>yarn.lock</em> (similar to Bundler&rsquo;s <em>Gemfile.lock</em> for Ruby).</p>
+
+<p>Migrating from npm to yarn is not totally seamless, however. For some reason, a few packages don’t transition as easily. In particular I had issues with <em>node-sass</em> and <em>phantom-js</em>. In one case, the issue was resolved by specifically adding the module with yarn (<code>yarn add node-sass</code>). In the case of <code>phantom-js</code>, though, we had to add a post-install script to our <em>package.json</em> that would run a phantomjs install script.</p>
+
+<p>Also, if you use Jenkins or other tools that keep a saved copy of your node_modules, you might have to clear out the old node_modules and reinstall.</p>
+
+<p>For Jenkins specifically, try:</p>
+
+<ol>
+<li>clearing the workspace,</li>
+<li>killing the instance of Jenkins, or</li>
+<li>add a post-build step to delete the workspace every time (which therefore runs a complete installation every time)</li>
+</ol>
+
+
+<h3>Fun bits</h3>
+
+<p>Fun fact: yarn preserves many helpful features of npm, like <a href="https://yarnpkg.com/lang/en/docs/cli/link/">symlinking</a>.</p>
+
+<p>For example, if you wanted to use your personal copy of <em>react</em> instead of Facebook’s <em>react</em> (pretend!), then you could run <code>yarn link</code> inside of the react directory, then <code>yarn link react</code> in your project directory. This would then substitute a link to your personal <em>react</em> copy for every <code>require(react)</code>.</p>
+
+<h3>Tying up loose ends</h3>
+
+<p>So far, it&rsquo;s been fun to knit yarn into our development process! Though I&rsquo;m still working through some of the knots&hellip;</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-02-23T08:26:15-08:00" pubdate data-updated="true"></time></div>
+	
+
+
+	
+</div></article>
 
     
     <article class="post">
@@ -1410,96 +1515,6 @@ But front-end code isn’t about manipulating data. It’s about user events and
 <div class="tags">
 
 	<a class='category' href='/blog/categories/diversity/'>diversity</a>, <a class='category' href='/blog/categories/social-justice/'>social_justice</a>
-
-</div>
-
-
-	
-</div></article>
-
-    
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2016/09/16/setting-goals/">
-		
-			Setting Goals</a>
-	</h2>
-	<div class="entry-content">
-		<p><img class="[SMARTGoals]" src="/images/SmartGoals.jpg" width="281" height="380" title="[SMART goals [image of SMART goal principles]]" ></p>
-
-<h6>Image: <a href="http://www.cognology.com.au/learning_center/howtowritesmartobj/">Cognology</a></h6>
-
-<h3>SMART goals</h3>
-
-<p>Today my new manager told me he believes measurable goals are overrated.</p>
-
-<p>Hm.</p>
-
-<p>Ever since I started working as a software engineer, I have been fearful of falling behind. Of not knowing enough. Of not being intelligent enough. I set tons of goals for myself as soon as I started my job, hoping to power through the uncertainty and the fear. At first these goals were hugely unhelpful. Not only were my lists of goals paralyzingly <em>long</em> &ndash; multiple pages in a Google doc &ndash; but they demanded time-consuming data-tracking just to know whether or not I was succeeding.</p>
-
-<p>When I worked for <a href="http://causes.com">Causes.com</a> organizing student organizers, I learned about <a href="https://en.wikipedia.org/wiki/SMART_criteria">SMART goals</a> &ndash; goals that are <strong>S</strong>pecific, <strong>M</strong>easurable, <strong>A</strong>chievable, <strong>R</strong>ealistic, and <strong>T</strong>imely. I thought SMART goals sounded so, well, smart. Having recently come from college organizing myself, I thought that a good campus campaign should be concrete, have an end date in sight, and convey a clear story about results &ndash; all things that SMART goals spoke to.</p>
-
-<p>Later, as a software engineer, I assumed that my personal goals should also be SMART. I spent a lot of time trying to think of ways to <em>measure</em> my knowledge and learning. By calculating sheer time spent? By counting the number of bonus study sessions per week? By recording a thing I learned every day? By counting numbers of pull requests, pairing sessions, projects completed on my own? I asked my most goal-oriented coworkers to help me craft my goals and strategies, I tried to institute new practices, I kept a daily log of things I&rsquo;d learned or accomplished.</p>
-
-<p>But in the end, my goals didn&rsquo;t act as the solid guideposts I was hoping for. They were worthwhile, for sure, because they forced me to clarify my challenges and intentions. But the act of setting those goals didn&rsquo;t get me much closer to the knowledge and skills &ndash; <em>or</em> the feelings of safety and progress &ndash; that I was after.</p>
-
-<h3>Measurable goals are overrated</h3>
-
-<p>At first, when my manager told me that measurable goals are overrated, I felt resistant. <em>Goals <strong>should</strong> be measurable,</em> I thought to myself, dismayed. <em>How else can you know that you&rsquo;re meeting them?</em> Especially considering the goals he was suggesting for me:</p>
-
-<ul>
-<li>acquiring mastery of UI development (by pairing closely with my new coworkers)</li>
-<li>developing leadership skills (via project ownership)</li>
-</ul>
-
-
-<p> <em>Mastery</em> was an exciting, thrilling word to read in the context of goals. But it made me feel nervous too. How would I know if I was on track for something as giant-sounding as &ldquo;mastery&rdquo;?</p>
-
-<p>When I asked that question, my manager said that forcing nuanced goals to meet requirements for objective measurability squashes out the <em>richness</em> of the overall goal. &ldquo;Mastery of UI development&rdquo; is a very rich goal &ndash; it has many aspects to it, none of which are easily measurable. In fact, it would require a good amount of mental contortion to find opportunities for objectivity.</p>
-
-<p>Hearing his arguments against measurability, I started to feel a sense of relief. This way, I wouldn&rsquo;t set myself up for another failure on improperly-calibrated, falsely-measurable goals. I wouldn&rsquo;t have to add a bunch of tasks to my daily to-do list just to try and track progress. I wouldn&rsquo;t be handing myself yet another yardstick with which to measure myself and find myself lacking.</p>
-
-<p>The part that finally sold me: my manager asserted that <strong>the point of having these goals is to feel excited about coming to work each day.</strong> Thinking about UI mastery (as unmeasurable as it is) is already doing the trick.</p>
-
-<h3>Relational goals</h3>
-
-<p>An interesting aspect of my manager&rsquo;s goals philosophy is that I can meet my goals simply by going about my regular business: by collaborating on code each day with good conscience and good intentions, and by talking with my manager each week in our regular check-in to resolve challenges as they come up.</p>
-
-<p>This aspect reminded me of a term I&rsquo;ve started hearing recently in activist circles, something called <a href="http://southernersonnewground.org/wp-content/uploads/2012/12/SONG-Relational-Organizing.pdf">relational organizing</a>. In relational organizing, as I understand it, human-to-human relationships are the basis upon which community activism and power is built.</p>
-
-<p>Transferring this idea to my goals at work, the relationship is the building block. Not numbers of facts learned in a day, not PR counts. My goals will be met via relationships bewteen me and my coworkers and between myself and my manager. Goals will be achieved not by the individual studying solo and on the side, but by the individual being incorporated into the flow of others' work.</p>
-
-<p>I think I&rsquo;m going to really enjoy coming to work each day with this in mind.</p>
-
-<hr />
-
-<p>P.S. Apologies to SONG if I&rsquo;m misusing the concept of relational organizing!</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-09-16T22:13:03-07:00" pubdate data-updated="true"></time></div>
-	
-
-<div class="tags">
-
-	<a class='category' href='/blog/categories/goals/'>goals</a>
 
 </div>
 
