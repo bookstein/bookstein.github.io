@@ -4,7 +4,7 @@
   <title><![CDATA[Category: javascript | Blogstein]]></title>
   <link href="http://bookstein.github.io/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2017-02-23T09:05:49-08:00</updated>
+  <updated>2017-03-11T16:13:28-08:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -12,6 +12,88 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Node modules]]></title>
+    <link href="http://bookstein.github.io/blog/2017/03/11/node-modules/"/>
+    <updated>2017-03-11T15:57:07-08:00</updated>
+    <id>http://bookstein.github.io/blog/2017/03/11/node-modules</id>
+    <content type="html"><![CDATA[<p>This week I worked on and helped publish a <a href="https://www.npmjs.com/package/@newrelic/publish-sourcemap">node module for pushing source maps</a> to a public API. It’s only the second time I’ve worked on a from-scratch node module, and it’s enlightening — like pulling back the curtain to reveal the truth behind the Wizard of Oz.</p>
+
+<p>Node modules aren’t magical (though they&rsquo;re no humbugs either). They fulfill a pretty specific purpose: a way to encapsulate reusable code in a way that’s easily managed.</p>
+
+<h3>Why node modules matter</h3>
+
+<p>Before node modules were really a thing, reusable code snippets were often pulled out into Immediately Invoked Function Expressions (IIFEs) or stored inside of variables (the Revealing Module pattern).</p>
+
+<pre><code class="javascript">var sayAName = (function () {
+     var privateName = 'name is not set yet';
+
+     function publicSetName (name) {
+          privateName = name;
+     }
+
+     function publicSayName () {
+          console.log('Hi, ' + privateName);
+     }
+
+     return {
+          setName: publicSetName,
+          sayName: publicSayName
+     };
+})()
+
+sayAName.setName('emily')
+sayAName.sayName()
+// 'emily'
+</code></pre>
+
+<h5>Example inspired by <a href="https://addyosmani.com/resources/essentialjsdesignpatterns/book/#revealingmodulepatternjavascript">Addy Osmani&rsquo;s Design Patterns</a></h5>
+
+<p>But with this pattern, you don’t have much ability to manage dependencies or make explicit versioning changes. That’s where node modules are so handy. Not only is the code easily reusable and self-contained, but a version change is as easy as bumping a number in the package.json.</p>
+
+<p>Node modules come in a couple different formats, but the new ES6 format is the one I’m most familiar with.</p>
+
+<pre><code class="javascript">// lib/bye.js
+export function sayGoodbye(){
+  console.log('Bye');
+}
+
+// app.js
+import { sayGoodbye } from './lib/bye'
+</code></pre>
+
+<p>ES6’s native module format uses <code>export</code> and <code>import</code> tokens to share consts, functions, and objects between files.</p>
+
+<p>(I’ve also used <code>module.exports</code> and <code>require</code>, the CommonJS module format, in various projects depending on whether we&rsquo;re transpiling to support ES5.)</p>
+
+<pre><code class="javascript">var dep1 = require('./dep1'); 
+var dep2 = require('./dep2');
+
+module.exports = function(){ 
+  // ...
+}
+</code></pre>
+
+<h3>Publishing node modules</h3>
+
+<p>Publishing a node module to npm is a pretty sweet feeling &ndash; like getting a book published, except much easier. Although versioning comes with its own quirks.</p>
+
+<p>When working on the node module for pushing source maps, we made several small changes to the 4.0.1 release to fix some tiny bugs. We published those changes to <a href="npmjs.com">npm</a> as pre-releases, indicating that the changes were not yet stable. The pre-release version numbers looked like this: <code>4.0.1-2</code></p>
+
+<p>When you installed <code>@latest</code> or an unspecified version number, though, you got the pre-release instead of the release (4.0.1). That’s not ideal behavior; you want people to be able to opt into prereleases.</p>
+
+<p>Here’s the trick: when publishing to npm, you can tag a release with <code>prerelease</code> or ‘next’ explicitly, which will override the default tag of <code>latest</code>. Then you can make incremental changes to your heart’s content until it’s time for the next real version bump!</p>
+
+<h3>Sources</h3>
+
+<ul>
+<li><a href="http://jvandemo.com/a-10-minute-primer-to-javascript-modules-module-formats-module-loaders-and-module-bundlers">http://jvandemo.com/a-10-minute-primer-to-javascript-modules-module-formats-module-loaders-and-module-bundlers</a></li>
+<li><a href="https://addyosmani.com/resources/essentialjsdesignpatterns/book/#revealingmodulepatternjavascript">https://addyosmani.com/resources/essentialjsdesignpatterns/book/#revealingmodulepatternjavascript</a></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Whoop Whoop! Event Loop!]]></title>

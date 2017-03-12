@@ -4,7 +4,7 @@
   <title><![CDATA[Blogstein]]></title>
   <link href="http://bookstein.github.io/atom.xml" rel="self"/>
   <link href="http://bookstein.github.io/"/>
-  <updated>2017-02-23T09:05:49-08:00</updated>
+  <updated>2017-03-11T16:13:28-08:00</updated>
   <id>http://bookstein.github.io/</id>
   <author>
     <name><![CDATA[Emily Bookstein]]></name>
@@ -12,6 +12,124 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Node modules]]></title>
+    <link href="http://bookstein.github.io/blog/2017/03/11/node-modules/"/>
+    <updated>2017-03-11T15:57:07-08:00</updated>
+    <id>http://bookstein.github.io/blog/2017/03/11/node-modules</id>
+    <content type="html"><![CDATA[<p>This week I worked on and helped publish a <a href="https://www.npmjs.com/package/@newrelic/publish-sourcemap">node module for pushing source maps</a> to a public API. It’s only the second time I’ve worked on a from-scratch node module, and it’s enlightening — like pulling back the curtain to reveal the truth behind the Wizard of Oz.</p>
+
+<p>Node modules aren’t magical (though they&rsquo;re no humbugs either). They fulfill a pretty specific purpose: a way to encapsulate reusable code in a way that’s easily managed.</p>
+
+<h3>Why node modules matter</h3>
+
+<p>Before node modules were really a thing, reusable code snippets were often pulled out into Immediately Invoked Function Expressions (IIFEs) or stored inside of variables (the Revealing Module pattern).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">sayAName</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>     <span class="kd">var</span> <span class="nx">privateName</span> <span class="o">=</span> <span class="s1">&#39;name is not set yet&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>     <span class="kd">function</span> <span class="nx">publicSetName</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">privateName</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'>     <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>     <span class="kd">function</span> <span class="nx">publicSayName</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Hi, &#39;</span> <span class="o">+</span> <span class="nx">privateName</span><span class="p">);</span>
+</span><span class='line'>     <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>     <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">setName</span><span class="o">:</span> <span class="nx">publicSetName</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">sayName</span><span class="o">:</span> <span class="nx">publicSayName</span>
+</span><span class='line'>     <span class="p">};</span>
+</span><span class='line'><span class="p">})()</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">sayAName</span><span class="p">.</span><span class="nx">setName</span><span class="p">(</span><span class="s1">&#39;emily&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="nx">sayAName</span><span class="p">.</span><span class="nx">sayName</span><span class="p">()</span>
+</span><span class='line'><span class="c1">// &#39;emily&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h5>Example inspired by <a href="https://addyosmani.com/resources/essentialjsdesignpatterns/book/#revealingmodulepatternjavascript">Addy Osmani&rsquo;s Design Patterns</a></h5>
+
+<p>But with this pattern, you don’t have much ability to manage dependencies or make explicit versioning changes. That’s where node modules are so handy. Not only is the code easily reusable and self-contained, but a version change is as easy as bumping a number in the package.json.</p>
+
+<p>Node modules come in a couple different formats, but the new ES6 format is the one I’m most familiar with.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// lib/bye.js</span>
+</span><span class='line'><span class="kr">export</span> <span class="kd">function</span> <span class="nx">sayGoodbye</span><span class="p">(){</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Bye&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// app.js</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">sayGoodbye</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./lib/bye&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ES6’s native module format uses <code>export</code> and <code>import</code> tokens to share consts, functions, and objects between files.</p>
+
+<p>(I’ve also used <code>module.exports</code> and <code>require</code>, the CommonJS module format, in various projects depending on whether we&rsquo;re transpiling to support ES5.)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">dep1</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./dep1&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">dep2</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./dep2&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>  <span class="c1">// ...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Publishing node modules</h3>
+
+<p>Publishing a node module to npm is a pretty sweet feeling &ndash; like getting a book published, except much easier. Although versioning comes with its own quirks.</p>
+
+<p>When working on the node module for pushing source maps, we made several small changes to the 4.0.1 release to fix some tiny bugs. We published those changes to <a href="npmjs.com">npm</a> as pre-releases, indicating that the changes were not yet stable. The pre-release version numbers looked like this: <code>4.0.1-2</code></p>
+
+<p>When you installed <code>@latest</code> or an unspecified version number, though, you got the pre-release instead of the release (4.0.1). That’s not ideal behavior; you want people to be able to opt into prereleases.</p>
+
+<p>Here’s the trick: when publishing to npm, you can tag a release with <code>prerelease</code> or ‘next’ explicitly, which will override the default tag of <code>latest</code>. Then you can make incremental changes to your heart’s content until it’s time for the next real version bump!</p>
+
+<h3>Sources</h3>
+
+<ul>
+<li><a href="http://jvandemo.com/a-10-minute-primer-to-javascript-modules-module-formats-module-loaders-and-module-bundlers">http://jvandemo.com/a-10-minute-primer-to-javascript-modules-module-formats-module-loaders-and-module-bundlers</a></li>
+<li><a href="https://addyosmani.com/resources/essentialjsdesignpatterns/book/#revealingmodulepatternjavascript">https://addyosmani.com/resources/essentialjsdesignpatterns/book/#revealingmodulepatternjavascript</a></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Gosh Yarn It]]></title>
